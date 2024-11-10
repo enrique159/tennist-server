@@ -1,6 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Role } from '../domain/user';
+import {
+  CourtTypePreference,
+  Experience,
+  PlayerGoals,
+  PlayingStyle,
+  Role,
+  DominantHand,
+  GamePreference,
+  Gender,
+} from '../domain/user';
 
 export type UserDocument = User & Document;
 
@@ -9,6 +18,8 @@ export type UserDocument = User & Document;
   versionKey: false,
 })
 export class User {
+  _id?: string;
+
   @Prop({ required: true, unique: true })
   username: string;
 
@@ -21,7 +32,7 @@ export class User {
   @Prop({ required: true })
   password: string;
 
-  @Prop()
+  @Prop({ unique: true })
   phoneNumber: string;
 
   @Prop({ default: false })
@@ -33,8 +44,38 @@ export class User {
   @Prop()
   profileImageUrl: string;
 
-  @Prop({ required: true, enum: Role })
+  @Prop({ enum: Role, default: Role.PLAYER })
   role: Role;
+
+  @Prop({ enum: Gender, default: Gender.MALE })
+  gender: Gender;
+
+  @Prop({ default: 18 })
+  age: number;
+
+  @Prop({ enum: Experience, default: Experience.BEGGINER })
+  experience: Experience;
+
+  @Prop({ default: 0 })
+  playingTime: number;
+
+  @Prop({ enum: PlayingStyle, default: PlayingStyle.NONE })
+  playingStyle: PlayingStyle;
+
+  @Prop({ enum: CourtTypePreference, default: CourtTypePreference.HARD })
+  courtTypePreference: CourtTypePreference;
+
+  @Prop({ default: 0 })
+  gamesPerWeek: number;
+
+  @Prop({ enum: PlayerGoals, default: PlayerGoals.NONE })
+  playerGoals: PlayerGoals;
+
+  @Prop({ enum: DominantHand, default: DominantHand.RIGHT })
+  dominantHand: DominantHand;
+
+  @Prop({ enum: GamePreference, default: GamePreference.SINGLES })
+  gamePreference: GamePreference;
 
   @Prop({ default: 'active' })
   status: string;
@@ -78,6 +119,14 @@ export const UserSchema = SchemaFactory.createForClass(User);
   "fullName": "Nombre Completo",              // Nombre completo del usuario
   "profileImageUrl": "https://...",           // URL de la imagen de perfil (si aplica)
   "role": "user",                             // Rol del usuario (admin, user, etc.)
+  "experience": "intermediate",               // Nivel de experiencia del usuario (begginer, intermediate, advanced, pro)
+  "playingTime": 0,                           // Tiempo jugado en meses
+  "playingStyle": "none",                     // Estilo de juego (defensive, aggressive, general, none)
+  "courtTypePreference": "hard",              // Preferencia de tipo de pista (clay, grass, hard)
+  "gamesPerWeek": 0,                          // Juegos jugados por semana
+  "playerGoals": "none",                      // Objetivos del jugador (competitive, recreational, fitness, none)
+  "dominantHand": "right",                    // Mano dominante del jugador (left, right, both)
+  "gamePreference": "singles",                // Preferencia de juego (singles, doubles)
   "status": "active",                         // Estado de la cuenta (activo, inactivo, etc.)
   "isDeleted": false,                         // Borrado lógico (en lugar de eliminar el registro)
   "createdAt": ISODate("2023-10-01T10:00:00Z"), // Fecha de creación del registro

@@ -1,12 +1,11 @@
 import {
   IsEmail,
-  IsEnum,
   IsOptional,
   IsString,
   IsStrongPassword,
 } from 'class-validator';
 import { IsEmailUnique } from '../validators/is-email-unique.decorator';
-import { Role } from '../domain/user';
+import { IsPhoneNumberUnique } from '../validators/is-phone-unique.decorator';
 
 export class CreateUserDto {
   @IsEmail()
@@ -18,11 +17,9 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsString()
+  @IsPhoneNumberUnique()
   readonly phoneNumber?: string;
 
   @IsString()
   readonly fullName: string;
-
-  @IsEnum(Object.values(Role))
-  readonly role: Role;
 }
