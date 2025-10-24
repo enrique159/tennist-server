@@ -1,7 +1,7 @@
 import { User } from '@/users/domain/user';
 
 const modelFields = [
-  '_id',
+  'id',
   'username',
   'email',
   'emailVerified',

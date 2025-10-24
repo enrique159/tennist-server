@@ -17,38 +17,38 @@ export class UpdateExperienceUserDto {
 
   @IsOptional()
   @IsEnum(Object.values(Gender))
-  gender?: Gender;
+  readonly gender?: Gender;
 
   @IsOptional()
-  age?: number;
+  readonly age?: number;
 
   @IsOptional()
   @IsEnum(Object.values(Experience))
   readonly experience: Experience;
 
   @IsOptional()
-  playingTime?: number;
+  readonly playingTime?: number;
 
   @IsOptional()
   @IsEnum(Object.values(PlayingStyle))
-  playingStyle?: PlayingStyle;
+  readonly playingStyle?: PlayingStyle;
 
   @IsOptional()
   @IsEnum(Object.values(CourtTypePreference))
-  courtTypePreference?: CourtTypePreference;
+  readonly courtTypePreference?: CourtTypePreference;
 
   @IsOptional()
-  gamesPerWeek?: number;
+  readonly gamesPerWeek?: number;
 
   @IsOptional()
   @IsEnum(Object.values(PlayerGoals))
-  playerGoals?: PlayerGoals;
+  readonly playerGoals?: PlayerGoals;
 
   @IsOptional()
   @IsEnum(Object.values(DominantHand))
-  dominantHand?: DominantHand;
+  readonly dominantHand?: DominantHand;
 
   @IsOptional()
   @IsEnum(Object.values(GamePreference))
-  gamePreference?: GamePreference;
+  readonly gamePreference?: GamePreference;
 }

@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Get,
-  HttpStatus,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -15,18 +14,22 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@/auth/auth.guard';
 import { UpdateExperienceUserDto } from './dto/update-experience-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AwsService } from '@/shared/services/aws.services';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { UserToken } from './domain/user';
+import { User } from './user.entity';
 
 @Controller('users')
 export class UserController {
   constructor(
-    private readonly userService: UserService,
+    private readonly usersService: UsersService,
     private readonly awsService: AwsService,
   ) {}
 
@@ -35,14 +38,14 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Get()
   getAllUsers() {
-    return this.userService.getAllUsers();
+    return this.usersService.getAllUsers();
   }
 
   /* CREATE USER */
   // Crea un nuevo usuario en la base de datos, se registran por medio de la app
   @Post()
   createUser(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
-    return this.userService.createUser(createUserDto);
+    return this.usersService.createUser(createUserDto);
   }
 
   /* UPDATE USER EXPERIENCE */
@@ -55,42 +58,63 @@ export class UserController {
     updateUserExperienceDto: UpdateExperienceUserDto,
     @Param('id') id: string,
   ) {
-    return this.userService.updateUserExperience(updateUserExperienceDto, id);
+    return this.usersService.updateUserExperience(updateUserExperienceDto, id);
   }
 
   /* UPLOAD PROFILE IMAGE */
   // Carga una imagen de perfil del usuario, esto ocurre una vez que el usuario se registra por medio de la app
+  @Post('upload-image')
   @UseGuards(AuthGuard)
-  @Post('profile-image')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadProfileImage(
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
+          const uniqueName = crypto.randomUUID();
+          const extension = extname(file.originalname);
+          callback(null, `${uniqueName}${extension}`);
+        },
+      }),
+      fileFilter: (req, file, callback) => {
+        const validExtensions = /(jpg|jpeg|png|webp)$/;
+        const isValid = validExtensions.test(
+          extname(file.originalname).toLowerCase(),
+        );
+        if (!isValid) {
+          return callback(
+            new BadRequestException('Tipo de archivo no permitido'),
+            false,
+          );
+        }
+        callback(null, true);
+      },
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB
+      },
+    }),
+  )
+  async uploadImage(
     @UploadedFile() file: Express.Multer.File,
-    @Req() req: Request & { user: any },
-  ) {
-    const userToken = req.user;
-    let user;
-    this.userService
-      .findByEmail(userToken.email)
-      .then((response) => {
-        user = response;
-      })
-      .catch((error) => {
-        console.log(error);
-        throw new NotFoundException('User not found');
-      });
-
+    @Req() req: Request & { user: UserToken },
+  ): Promise<User> {
     if (!file) {
-      throw new BadRequestException('No file provided');
+      throw new BadRequestException('No se proporcionó un archivo');
     }
-
-    const mimetype = file.originalname.split('.').pop();
-    const key = `tennist/users/${user._id}/profile-image.${mimetype}`;
-    const response = await this.awsService.uploadFile(key, file);
-    if (!response || response.$metadata.httpStatusCode !== HttpStatus.OK) {
-      throw new InternalServerErrorException('Error uploading file');
+    const userId = req.user.id;
+    try {
+      return await this.usersService.uploadImage(userId, file, req);
+    } catch (error) {
+      console.error('Error en uploadImage:', error);
+      if (error?.message === 'UserNotFound') {
+        throw new NotFoundException('El usuario no se encontró');
+      }
+      if (error?.message === 'ArchivoInvalido') {
+        throw new BadRequestException('El archivo proporcionado no es válido');
+      }
+      throw new InternalServerErrorException(
+        `Error al subir la imagen: ${error.message}`,
+      );
     }
-
-    return { success: true };
   }
 
   /* UPDATE USER */
@@ -101,6 +125,6 @@ export class UserController {
     @Body(new ValidationPipe()) updateUserDto: UpdateUserDto,
     @Param('id') id: string,
   ) {
-    return this.userService.updateUser(updateUserDto, id);
+    return this.usersService.updateUser(updateUserDto, id);
   }
 }

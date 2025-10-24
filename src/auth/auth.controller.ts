@@ -66,7 +66,7 @@ export class AuthController {
     await this.authService.addLastLoginAndResetLoginAttempts(user.email);
 
     const signInResponse = new SignInResponseDto(
-      await this.jwtService.signAsync({ email: user.email }),
+      await this.jwtService.signAsync({ id: user.id, email: user.email }),
       user,
     );
 

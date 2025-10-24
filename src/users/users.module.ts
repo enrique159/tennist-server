@@ -1,20 +1,23 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { UserSchema } from './schemas/user.schema';
 import { UserController } from './user.controller';
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
 import { AwsService } from '../shared/services/aws.services';
 import { IsEmailUniqueConstraint } from './validators/is-email-unique.validator';
 import { IsPhoneNumberUniqueConstraint } from './validators/is-phone-unique.validator';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './user.entity';
+import { FilesModule } from '../files/files.module';
+import { FilesService } from '@/files/files.service';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: 'User', schema: UserSchema }])],
+  imports: [TypeOrmModule.forFeature([User]), FilesModule],
   controllers: [UserController],
   providers: [
-    UserService,
+    UsersService,
     IsEmailUniqueConstraint,
     IsPhoneNumberUniqueConstraint,
     AwsService,
+    FilesService
   ],
 })
 export class UsersModule {}

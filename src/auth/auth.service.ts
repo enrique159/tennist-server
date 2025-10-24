@@ -1,62 +1,73 @@
 import * as bcrypt from 'bcrypt';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User } from '@/users/schemas/user.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '@/users/user.entity';
 import { CreateUserDto } from '@/users/dto/create-user.dto';
 import { generateUsername } from '@/shared/utils/generateUsername';
-import { MongoErrorCodes } from '@/shared/enums/MongoErrorCodes';
 
 const TIME_LOCKED = 30 * 1000; // 30 segundos
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
 
   async findByEmailOrPhone(emailPhone: string): Promise<User> {
-    return this.userModel.findOne({
-      $or: [{ email: emailPhone }, { phoneNumber: emailPhone }],
+    return this.userRepository.findOne({
+      where: [
+        { email: emailPhone },
+        { phoneNumber: emailPhone },
+      ],
     });
   }
 
   async addLoginAttempt(email: string): Promise<User> {
-    return this.userModel.findOneAndUpdate(
-      { email },
-      { $inc: { loginAttempts: 1 } },
-      { new: true, upsert: true },
-    );
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (user) {
+      user.loginAttempts += 1;
+      return this.userRepository.save(user);
+    }
+    return null;
   }
 
   async resetLoginAttempts(email: string): Promise<User> {
-    return this.userModel.findOneAndUpdate(
-      { email },
-      { $set: { loginAttempts: 0 } },
-      { new: true, upsert: true },
-    );
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (user) {
+      user.loginAttempts = 0;
+      return this.userRepository.save(user);
+    }
+    return null;
   }
 
   async addLastLoginAndResetLoginAttempts(email: string): Promise<User> {
-    return this.userModel.findOneAndUpdate(
-      { email },
-      { $set: { lastLoginAt: new Date(), loginAttempts: 0 } },
-      { new: true, upsert: true },
-    );
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (user) {
+      user.lastLoginAt = new Date();
+      user.loginAttempts = 0;
+      return this.userRepository.save(user);
+    }
+    return null;
   }
 
   async lockAccount(email: string): Promise<User> {
-    return this.userModel.findOneAndUpdate(
-      { email },
-      { $set: { lockUntil: new Date(Date.now() + TIME_LOCKED) } },
-      { new: true, upsert: true },
-    );
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (user) {
+      user.lockUntil = new Date(Date.now() + TIME_LOCKED);
+      return this.userRepository.save(user);
+    }
+    return null;
   }
 
   async unlockAccount(email: string): Promise<User> {
-    return this.userModel.findOneAndUpdate(
-      { email },
-      { $set: { lockUntil: null } },
-      { new: true, upsert: true },
-    );
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (user) {
+      user.lockUntil = null;
+      return this.userRepository.save(user);
+    }
+    return null;
   }
 
   async createUser(user: CreateUserDto): Promise<User> {
@@ -67,18 +78,18 @@ export class AuthService {
       const hashedPassword = await bcrypt.hash(password, salt);
       const firstName = fullName.split(' ')[0];
 
-      const newUser = {
+      const newUser = this.userRepository.create({
         username: generateUsername(firstName),
         email: email.trim(),
         password: hashedPassword,
         phoneNumber: phoneNumber.trim(),
         fullName: fullName.trim().toLowerCase(),
-      };
+      });
 
-      const response = await this.userModel.create(newUser);
+      const response = await this.userRepository.save(newUser);
       return response;
     } catch (error) {
-      if (error.code === MongoErrorCodes.DUPLICATE_KEY) {
+      if (error.code === '23505' || error.code === 'ER_DUP_ENTRY') {
         throw new BadRequestException(
           'Ya existe un usuario con ese correo electrónico o teléfono',
         );

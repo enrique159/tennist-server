@@ -1,6 +1,10 @@
 export default () => ({
+  env: process.env.NODE_ENV || 'development',
+  isDev: process.env.NODE_ENV !== 'production',
   port: parseInt(process.env.PORT) || 3333,
   secretKey: process.env.SECRET_KEY || 'secret',
+  fileHost: process.env.FILE_HOST || `localhost:${process.env.PORT || 3333}`,
+  fileProtocol: process.env.FILE_PROTOCOL || 'http',
   s3: {
     url: process.env.S3_BUCKET_URL || 'https://tennist-bucket.s3.amazonaws.com',
     endpoint: process.env.S3_ENDPOINT || 'https://s3.amazonaws.com',

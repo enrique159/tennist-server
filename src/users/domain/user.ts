@@ -4,6 +4,11 @@ interface Users {
   users: User[];
 }
 
+export interface UserToken {
+  id: string;
+  email: string;
+}
+
 interface User extends Base {
   username: string;
   email: string;

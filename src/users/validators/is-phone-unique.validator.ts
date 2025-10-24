@@ -5,14 +5,14 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
-import { UserService } from '../user.service';
+import { UsersService } from '../users.service';
 
 @ValidatorConstraint({ async: true })
 @Injectable()
 export class IsPhoneNumberUniqueConstraint
   implements ValidatorConstraintInterface
 {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UsersService) {}
 
   async validate(
     phoneNumber: string,

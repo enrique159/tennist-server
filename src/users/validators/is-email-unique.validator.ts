@@ -5,12 +5,12 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
-import { UserService } from '../user.service';
+import { UsersService } from '../users.service';
 
 @ValidatorConstraint({ async: true })
 @Injectable()
 export class IsEmailUniqueConstraint implements ValidatorConstraintInterface {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UsersService) {}
 
   async validate(email: string, args: ValidationArguments): Promise<boolean> {
     const user = await this.userService.findByEmail(email);
