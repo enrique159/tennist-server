@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UsersService } from './users.service';
-import { AwsService } from '../shared/services/aws.services';
 import { IsEmailUniqueConstraint } from './validators/is-email-unique.validator';
 import { IsPhoneNumberUniqueConstraint } from './validators/is-phone-unique.validator';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -16,7 +15,6 @@ import { FilesService } from '@/files/files.service';
     UsersService,
     IsEmailUniqueConstraint,
     IsPhoneNumberUniqueConstraint,
-    AwsService,
     FilesService
   ],
 })

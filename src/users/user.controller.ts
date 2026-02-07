@@ -20,7 +20,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@/auth/auth.guard';
 import { UpdateExperienceUserDto } from './dto/update-experience-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AwsService } from '@/shared/services/aws.services';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { UserToken } from './domain/user';
@@ -30,7 +29,6 @@ import { User } from './user.entity';
 export class UserController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly awsService: AwsService,
   ) {}
 
   /* GET ALL USERS */
