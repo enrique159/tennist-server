@@ -25,10 +25,10 @@ interface User extends Base {
   playingTime?: number; // Tiempo jugado en meses
   playingStyle?: PlayingStyle;
   courtTypePreference?: CourtTypePreference;
+  gamePreference?: GamePreference;
   gamesPerWeek?: number; // Juegos jugados por semana
   playerGoals?: PlayerGoals;
   dominantHand?: DominantHand;
-  gamePreference?: GamePreference;
   status: string;
   isDeleted: boolean;
   lastLoginAt?: Date;
@@ -99,7 +99,7 @@ export {
   Experience,
   PlayingStyle,
   CourtTypePreference,
+  GamePreference,
   PlayerGoals,
   DominantHand,
-  GamePreference,
 };

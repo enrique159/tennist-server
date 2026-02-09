@@ -38,6 +38,10 @@ export class UpdateExperienceUserDto {
   readonly courtTypePreference?: CourtTypePreference;
 
   @IsOptional()
+  @IsEnum(Object.values(GamePreference))
+  readonly gamePreference?: GamePreference;
+
+  @IsOptional()
   readonly gamesPerWeek?: number;
 
   @IsOptional()
@@ -48,7 +52,4 @@ export class UpdateExperienceUserDto {
   @IsEnum(Object.values(DominantHand))
   readonly dominantHand?: DominantHand;
 
-  @IsOptional()
-  @IsEnum(Object.values(GamePreference))
-  readonly gamePreference?: GamePreference;
 }

@@ -9,6 +9,7 @@ import { generateUsername } from '@/shared/utils/generateUsername';
 import { UpdateExperienceUserDto } from './dto/update-experience-user.dto';
 import { extractFilenameFromUrl } from '@/shared/utils/extractFilenameFromUrl';
 import { FilesService } from '@/files/files.service';
+import { UserExperienceResponseDto } from './dto/user-experience-response.dto';
 
 @Injectable()
 export class UsersService {
@@ -68,9 +69,14 @@ export class UsersService {
   async updateUserExperience(
     user: Partial<UpdateExperienceUserDto>,
     id: string,
-  ): Promise<User> {
-    await this.userRepository.update(id, user);
-    return this.userRepository.findOne({ where: { id } });
+  ): Promise<UserExperienceResponseDto> {
+    const filteredUser = Object.fromEntries(
+      Object.entries(user).filter(([_, value]) => !!value)
+    );
+    await this.userRepository.update(id, filteredUser);
+    const updatedUser = await this.userRepository.findOne({ where: { id } });
+    const userExperienceResponseDto = new UserExperienceResponseDto(updatedUser);
+    return userExperienceResponseDto.returnUserExperience();
   }
 
   /* UPDATE USER */

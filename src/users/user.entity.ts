@@ -61,6 +61,9 @@ export class User implements Base {
   @Column({ name: 'court_type_preference', type: 'enum', enum: CourtTypePreference, default: CourtTypePreference.HARD })
   courtTypePreference: CourtTypePreference;
 
+  @Column({ name: 'game_preference', type: 'enum', enum: GamePreference, default: GamePreference.SINGLES })
+  gamePreference: GamePreference;
+
   @Column({ name: 'games_per_week', default: 0 })
   gamesPerWeek: number;
 
@@ -69,9 +72,6 @@ export class User implements Base {
 
   @Column({ name: 'dominant_hand', type: 'enum', enum: DominantHand, default: DominantHand.RIGHT })
   dominantHand: DominantHand;
-
-  @Column({ name: 'game_preference', type: 'enum', enum: GamePreference, default: GamePreference.SINGLES })
-  gamePreference: GamePreference;
 
   @Column({ default: 'active' })
   status: string;
