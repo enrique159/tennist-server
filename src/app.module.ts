@@ -9,6 +9,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { FilesModule } from './files/files.module';
+import { CourtsModule } from './courts/courts.module';
+import { VenuesModule } from './venues/venues.module';
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { FilesModule } from './files/files.module';
     FilesModule,
     UsersModule,
     AuthModule,
+    CourtsModule,
+    VenuesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

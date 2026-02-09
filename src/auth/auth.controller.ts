@@ -29,7 +29,7 @@ export class AuthController {
     const user = await this.authService.findByEmailOrPhone(emailPhone);
     if (!user) {
       throw new NotFoundException(
-        'No user found with that email or phone number',
+        'No se encontró ningún usuario con ese correo electrónico o número de teléfono',
       );
     }
 
@@ -39,7 +39,7 @@ export class AuthController {
       compareCurrentDateWithLockUntil(new Date(), user.lockUntil)
     ) {
       throw new UnauthorizedException(
-        'Your account is locked out, wait a few minutes before trying again',
+        'Tu cuenta está bloqueada, espera unos minutos antes de intentar nuevamente',
       );
     } else if (
       user.lockUntil &&
@@ -50,7 +50,7 @@ export class AuthController {
       await this.authService.lockAccount(user.email);
       await this.authService.resetLoginAttempts(user.email);
       throw new UnauthorizedException(
-        'Your account is locked out, wait a few minutes before trying again',
+        'Tu cuenta está bloqueada, espera unos minutos antes de intentar nuevamente',
       );
     }
 
@@ -59,7 +59,7 @@ export class AuthController {
       await this.authService.addLoginAttempt(user.email);
       const remainingAttempts = 5 - (user.loginAttempts + 1);
       throw new UnauthorizedException(
-        `The password is incorrect. You have ${remainingAttempts} attempt(s) left before your account is locked.`,
+        `La contraseña es incorrecta. Te quedan ${remainingAttempts} intento(s) antes de que tu cuenta sea bloqueada.`,
       );
     }
 

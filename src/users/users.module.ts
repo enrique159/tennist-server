@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { UserController } from './user.controller';
+import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { IsEmailUniqueConstraint } from './validators/is-email-unique.validator';
 import { IsPhoneNumberUniqueConstraint } from './validators/is-phone-unique.validator';
@@ -10,7 +10,7 @@ import { FilesService } from '@/files/files.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User]), FilesModule],
-  controllers: [UserController],
+  controllers: [UsersController],
   providers: [
     UsersService,
     IsEmailUniqueConstraint,

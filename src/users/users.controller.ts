@@ -26,7 +26,7 @@ import { UserToken } from './domain/user';
 import { User } from './user.entity';
 
 @Controller('users')
-export class UserController {
+export class UsersController {
   constructor(
     private readonly usersService: UsersService,
   ) {}
