@@ -249,6 +249,156 @@
       "description": "Gestión de venues (lugares deportivos)"
     },
     {
+      "name": "Venue Images",
+      "item": [
+        {
+          "name": "Subir imagen de venue",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "",
+                  "description": "Archivo de imagen (jpg, jpeg, png, webp). Máx 5MB"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/venues/:venueId/images",
+              "host": ["{{base_url}}"],
+              "path": ["venues", ":venueId", "images"],
+              "variable": [
+                {
+                  "key": "venueId",
+                  "value": "",
+                  "description": "ID del venue"
+                }
+              ]
+            },
+            "description": "Sube una imagen para un venue. Requiere ser propietario del venue o ADMIN.\n\nFormatos aceptados: jpg, jpeg, png, webp\nTamaño máximo: 5MB"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar imágenes de venue",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/venues/:venueId/images",
+              "host": ["{{base_url}}"],
+              "path": ["venues", ":venueId", "images"],
+              "variable": [
+                {
+                  "key": "venueId",
+                  "value": "",
+                  "description": "ID del venue"
+                }
+              ]
+            },
+            "description": "Obtiene todas las imágenes de un venue ordenadas por displayOrder"
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar imagen",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/venues/images/:imageId",
+              "host": ["{{base_url}}"],
+              "path": ["venues", "images", ":imageId"],
+              "variable": [
+                {
+                  "key": "imageId",
+                  "value": "",
+                  "description": "ID de la imagen"
+                }
+              ]
+            },
+            "description": "Elimina una imagen de un venue y su archivo del sistema"
+          },
+          "response": []
+        },
+        {
+          "name": "Reordenar imagen",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"displayOrder\": 0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/venues/images/:imageId/order",
+              "host": ["{{base_url}}"],
+              "path": ["venues", "images", ":imageId", "order"],
+              "variable": [
+                {
+                  "key": "imageId",
+                  "value": "",
+                  "description": "ID de la imagen"
+                }
+              ]
+            },
+            "description": "Actualiza el orden de visualización de una imagen"
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de imágenes de venues"
+    },
+    {
       "name": "Courts",
       "item": [
         {

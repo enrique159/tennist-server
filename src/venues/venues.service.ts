@@ -66,7 +66,7 @@ export class VenuesService {
   async findById(id: string): Promise<Venue> {
     const venue = await this.venueRepository.findOne({
       where: { id },
-      relations: ['courts'],
+      relations: ['courts', 'images'],
     });
 
     if (!venue) {
@@ -87,7 +87,9 @@ export class VenuesService {
     // Construir query base
     const queryBuilder = this.venueRepository
       .createQueryBuilder('venue')
-      .leftJoinAndSelect('venue.courts', 'courts');
+      .leftJoinAndSelect('venue.courts', 'courts')
+      .leftJoinAndSelect('venue.images', 'images')
+      .addOrderBy('images.display_order', 'ASC');
 
     // Aplicar filtros opcionales
     if (type) {

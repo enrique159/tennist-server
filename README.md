@@ -250,6 +250,58 @@ Authorization: Bearer <token>
 
 ---
 
+### 🖼️ Imágenes de Venues
+
+#### Subir imagen
+```http
+POST /venues/:venueId/images
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+image: <archivo jpg|jpeg|png|webp> (máx. 5MB)
+```
+
+**Permisos requeridos:**
+- Usuario debe ser propietario del venue o ADMIN
+
+**Respuesta exitosa:**
+```json
+{
+  "id": "uuid",
+  "imageUrl": "http://localhost:3000/files/abc123.jpg",
+  "displayOrder": 0,
+  "venueId": "uuid",
+  "createdAt": "2024-01-01T00:00:00.000Z"
+}
+```
+
+#### Listar imágenes de un venue
+```http
+GET /venues/:venueId/images
+Authorization: Bearer <token>
+```
+
+#### Eliminar imagen
+```http
+DELETE /venues/images/:imageId
+Authorization: Bearer <token>
+```
+
+#### Reordenar imagen
+```http
+PUT /venues/images/:imageId/order
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "displayOrder": 2
+}
+```
+
+**Nota:** Las imágenes se incluyen automáticamente en las respuestas de `GET /venues/:id` y `GET /venues/nearby`, ordenadas por `displayOrder`.
+
+---
+
 ### 🎾 Canchas (Courts)
 
 #### Crear cancha en un venue

@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Court } from '@/courts/entities/court.entity';
+import { VenueImage } from './entities/venue-image.entity';
 import { BaseStatus } from '@/shared/domain/status';
 
 export enum VenueType {
@@ -51,6 +52,9 @@ export class Venue {
 
   @OneToMany(() => Court, (court) => court.venue)
   courts: Court[];
+
+  @OneToMany(() => VenueImage, (image) => image.venue)
+  images: VenueImage[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
