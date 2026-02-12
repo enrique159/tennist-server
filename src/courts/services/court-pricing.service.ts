@@ -1,8 +1,12 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Court } from '../entities/court.entity';
 import { CourtPricingRule, PricingType } from '../entities/court-pricing-rule.entity';
+import { Venue } from '@/venues/venue.entity';
+import { CreateCourtPricingRuleDto } from '../dto/create-court-pricing-rule.dto';
+import { UpdateCourtPricingRuleDto } from '../dto/update-court-pricing-rule.dto';
+import { Role } from '@/users/domain/user';
 
 export interface PriceCalculation {
   totalPriceCents: number;
@@ -16,6 +20,8 @@ export class CourtPricingService {
     private courtRepository: Repository<Court>,
     @InjectRepository(CourtPricingRule)
     private pricingRuleRepository: Repository<CourtPricingRule>,
+    @InjectRepository(Venue)
+    private venueRepository: Repository<Venue>,
   ) {}
 
   /**
@@ -118,5 +124,134 @@ export class CourtPricingService {
     }
 
     return rule.price;
+  }
+
+  /**
+   * @description Crea una regla de precio para una cancha
+   * @param { string } courtId - ID de la cancha
+   * @param { CreateCourtPricingRuleDto } createPricingRuleDto - Datos de la regla de precio
+   * @param { any } currentUser - Usuario actual que realiza la acción
+   * @returns { Promise<CourtPricingRule> } Regla de precio creada
+   */
+  async create(
+    courtId: string,
+    createPricingRuleDto: CreateCourtPricingRuleDto,
+    currentUser: any,
+  ): Promise<CourtPricingRule> {
+    const court = await this.courtRepository.findOne({
+      where: { id: courtId },
+      relations: ['venue'],
+    });
+
+    if (!court) {
+      throw new NotFoundException(`Cancha con ID ${courtId} no encontrada`);
+    }
+
+    const venue = await this.venueRepository.findOne({
+      where: { id: court.venueId },
+    });
+
+    if (currentUser.role !== Role.ADMIN && venue.ownerUserId !== currentUser.id) {
+      throw new ForbiddenException('No tienes permiso para gestionar precios de esta cancha');
+    }
+
+    if (
+      createPricingRuleDto.maxDurationMinutes &&
+      createPricingRuleDto.minDurationMinutes > createPricingRuleDto.maxDurationMinutes
+    ) {
+      throw new BadRequestException(
+        'La duración mínima no puede ser mayor que la duración máxima',
+      );
+    }
+
+    const pricingRule = this.pricingRuleRepository.create({
+      ...createPricingRuleDto,
+      courtId,
+    });
+
+    return await this.pricingRuleRepository.save(pricingRule);
+  }
+
+  /**
+   * @description Obtiene todas las reglas de precio de una cancha
+   * @param { string } courtId - ID de la cancha
+   * @returns { Promise<CourtPricingRule[]> } Lista de reglas de precio
+   */
+  async findByCourtId(courtId: string): Promise<CourtPricingRule[]> {
+    const court = await this.courtRepository.findOne({ where: { id: courtId } });
+
+    if (!court) {
+      throw new NotFoundException(`Cancha con ID ${courtId} no encontrada`);
+    }
+
+    return await this.pricingRuleRepository.find({
+      where: { courtId },
+    });
+  }
+
+  /**
+   * @description Actualiza una regla de precio existente
+   * @param { string } ruleId - ID de la regla de precio
+   * @param { UpdateCourtPricingRuleDto } updatePricingRuleDto - Datos a actualizar
+   * @param { any } currentUser - Usuario actual que realiza la acción
+   * @returns { Promise<CourtPricingRule> } Regla de precio actualizada
+   */
+  async update(
+    ruleId: string,
+    updatePricingRuleDto: UpdateCourtPricingRuleDto,
+    currentUser: any,
+  ): Promise<CourtPricingRule> {
+    const rule = await this.pricingRuleRepository.findOne({
+      where: { id: ruleId },
+      relations: ['court', 'court.venue'],
+    });
+
+    if (!rule) {
+      throw new NotFoundException(`Regla de precio con ID ${ruleId} no encontrada`);
+    }
+
+    const venue = rule.court.venue;
+
+    if (currentUser.role !== Role.ADMIN && venue.ownerUserId !== currentUser.id) {
+      throw new ForbiddenException('No tienes permiso para modificar esta regla de precio');
+    }
+
+    const minDuration = updatePricingRuleDto.minDurationMinutes ?? rule.minDurationMinutes;
+    const maxDuration = updatePricingRuleDto.maxDurationMinutes ?? rule.maxDurationMinutes;
+
+    if (maxDuration && minDuration > maxDuration) {
+      throw new BadRequestException(
+        'La duración mínima no puede ser mayor que la duración máxima',
+      );
+    }
+
+    Object.assign(rule, updatePricingRuleDto);
+
+    return await this.pricingRuleRepository.save(rule);
+  }
+
+  /**
+   * @description Elimina una regla de precio
+   * @param { string } ruleId - ID de la regla de precio
+   * @param { any } currentUser - Usuario actual que realiza la acción
+   * @returns { Promise<void> }
+   */
+  async delete(ruleId: string, currentUser: any): Promise<void> {
+    const rule = await this.pricingRuleRepository.findOne({
+      where: { id: ruleId },
+      relations: ['court', 'court.venue'],
+    });
+
+    if (!rule) {
+      throw new NotFoundException(`Regla de precio con ID ${ruleId} no encontrada`);
+    }
+
+    const venue = rule.court.venue;
+
+    if (currentUser.role !== Role.ADMIN && venue.ownerUserId !== currentUser.id) {
+      throw new ForbiddenException('No tienes permiso para eliminar esta regla de precio');
+    }
+
+    await this.pricingRuleRepository.remove(rule);
   }
 }

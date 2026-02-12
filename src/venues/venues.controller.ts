@@ -1,6 +1,7 @@
-import { Controller, Post, Get, Param, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, Query, UseGuards, Request } from '@nestjs/common';
 import { VenuesService } from './venues.service';
 import { CreateVenueDto } from './dto/create-venue.dto';
+import { FindNearbyVenuesDto } from './dto/find-nearby-venues.dto';
 import { Venue, VenueType } from './venue.entity';
 import { AuthGuard } from '@/auth/auth.guard';
 import { RolesGuard } from '@/shared/guards/roles.guard';
@@ -31,6 +32,11 @@ export class VenuesController {
     }
 
     throw new Error('Tipo de venue inválido');
+  }
+
+  @Get('nearby')
+  async getNearbyVenues(@Query() filters: FindNearbyVenuesDto): Promise<Array<Venue & { distance: number }>> {
+    return this.venuesService.findNearby(filters);
   }
 
   @Get(':id')

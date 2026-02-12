@@ -45,7 +45,7 @@ export class Court implements Base {
   isActive: boolean;
 
   @ManyToOne(() => Venue, (venue) => venue.courts, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'venueId' })
+  @JoinColumn({ name: 'venue_id' })
   venue: Venue;
 
   @Column({ name: 'venue_id' })

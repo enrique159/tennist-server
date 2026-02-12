@@ -1,0 +1,811 @@
+{
+  "info": {
+    "name": "Tennist API",
+    "description": "Colección de endpoints para la API de Tennist - Sistema de gestión de tenis",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "tennist-api"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Registro de usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"usuario@example.com\",\n  \"password\": \"password123\",\n  \"phoneNumber\": \"+1234567890\",\n  \"fullName\": \"Juan Pérez\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/signup",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "signup"]
+            },
+            "description": "Crea una nueva cuenta de usuario en el sistema"
+          },
+          "response": []
+        },
+        {
+          "name": "Inicio de sesión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set(\"auth_token\", jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emailPhone\": \"usuario@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/signin",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "signin"]
+            },
+            "description": "Inicia sesión y obtiene un token JWT. El token se guarda automáticamente en la variable auth_token."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints de autenticación y gestión de sesiones"
+    },
+    {
+      "name": "Venues",
+      "item": [
+        {
+          "name": "Crear venue público (ADMIN)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Parque Deportivo Municipal\",\n  \"description\": \"Instalaciones públicas de tenis\",\n  \"address\": \"Av. Reforma 100, Ciudad\",\n  \"lat\": 19.4326,\n  \"lng\": -99.1332,\n  \"type\": \"PUBLIC\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/venues",
+              "host": ["{{base_url}}"],
+              "path": ["venues"]
+            },
+            "description": "Crea un venue público. Solo usuarios con rol ADMIN pueden crear venues públicos."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear venue privado (CLUB_OWNER)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Club Deportivo Central\",\n  \"description\": \"Club de tenis con instalaciones de primer nivel\",\n  \"address\": \"Av. Principal 123, Ciudad\",\n  \"lat\": 19.4326,\n  \"lng\": -99.1332,\n  \"type\": \"PRIVATE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/venues",
+              "host": ["{{base_url}}"],
+              "path": ["venues"]
+            },
+            "description": "Crea un venue privado. Usuarios con rol CLUB_OWNER o ADMIN pueden crear venues privados."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar venues cercanos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/venues/nearby?lat=19.4326&lng=-99.1332&radiusKm=10&type=PUBLIC&status=active",
+              "host": ["{{base_url}}"],
+              "path": ["venues", "nearby"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "19.4326",
+                  "description": "Latitud de tu ubicación (requerido)"
+                },
+                {
+                  "key": "lng",
+                  "value": "-99.1332",
+                  "description": "Longitud de tu ubicación (requerido)"
+                },
+                {
+                  "key": "radiusKm",
+                  "value": "10",
+                  "description": "Radio de búsqueda en km (opcional, default: 10, max: 100)"
+                },
+                {
+                  "key": "type",
+                  "value": "PUBLIC",
+                  "description": "Tipo de venue: PUBLIC o PRIVATE (opcional)"
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Estado: active, inactive, deleted (opcional, default: active)"
+                }
+              ]
+            },
+            "description": "Busca venues cercanos a tu ubicación con filtros opcionales.\n\nLos resultados incluyen la distancia en km y están ordenados del más cercano al más lejano.\n\nPor defecto solo muestra venues activos."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener venue por ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/venues/:venueId",
+              "host": ["{{base_url}}"],
+              "path": ["venues", ":venueId"],
+              "variable": [
+                {
+                  "key": "venueId",
+                  "value": "",
+                  "description": "ID del venue"
+                }
+              ]
+            },
+            "description": "Obtiene la información de un venue específico incluyendo sus canchas"
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de venues (lugares deportivos)"
+    },
+    {
+      "name": "Courts",
+      "item": [
+        {
+          "name": "Crear cancha",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cancha Central\",\n  \"surface\": \"CLAY\",\n  \"isIndoor\": false,\n  \"isLighted\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/venues/:venueId/courts",
+              "host": ["{{base_url}}"],
+              "path": ["venues", ":venueId", "courts"],
+              "variable": [
+                {
+                  "key": "venueId",
+                  "value": "",
+                  "description": "ID del venue donde se creará la cancha"
+                }
+              ]
+            },
+            "description": "Crea una nueva cancha en un venue. El usuario debe ser propietario del venue o ADMIN.\n\nTipos de superficie:\n- HARD: Cancha dura\n- CLAY: Arcilla\n- GRASS: Césped\n- SYNTHETIC: Sintética"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar canchas de un venue",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/venues/:venueId/courts",
+              "host": ["{{base_url}}"],
+              "path": ["venues", ":venueId", "courts"],
+              "variable": [
+                {
+                  "key": "venueId",
+                  "value": "",
+                  "description": "ID del venue"
+                }
+              ]
+            },
+            "description": "Obtiene todas las canchas de un venue específico"
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de canchas de tenis"
+    },
+    {
+      "name": "Court Schedules",
+      "item": [
+        {
+          "name": "Crear horario semanal",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dayOfWeek\": 1,\n  \"startTime\": \"08:00\",\n  \"endTime\": \"20:00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/courts/:courtId/schedules",
+              "host": ["{{base_url}}"],
+              "path": ["courts", ":courtId", "schedules"],
+              "variable": [
+                {
+                  "key": "courtId",
+                  "value": "",
+                  "description": "ID de la cancha"
+                }
+              ]
+            },
+            "description": "Crea un horario semanal para una cancha.\n\ndayOfWeek: 0=Domingo, 1=Lunes, ..., 6=Sábado\nRequiere ser propietario del venue o ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar horarios de cancha",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/courts/:courtId/schedules",
+              "host": ["{{base_url}}"],
+              "path": ["courts", ":courtId", "schedules"],
+              "variable": [
+                {
+                  "key": "courtId",
+                  "value": "",
+                  "description": "ID de la cancha"
+                }
+              ]
+            },
+            "description": "Obtiene todos los horarios semanales de una cancha"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar horario",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startTime\": \"09:00\",\n  \"endTime\": \"21:00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/courts/schedules/:scheduleId",
+              "host": ["{{base_url}}"],
+              "path": ["courts", "schedules", ":scheduleId"],
+              "variable": [
+                {
+                  "key": "scheduleId",
+                  "value": "",
+                  "description": "ID del horario"
+                }
+              ]
+            },
+            "description": "Actualiza un horario existente"
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar horario",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/courts/schedules/:scheduleId",
+              "host": ["{{base_url}}"],
+              "path": ["courts", "schedules", ":scheduleId"],
+              "variable": [
+                {
+                  "key": "scheduleId",
+                  "value": "",
+                  "description": "ID del horario"
+                }
+              ]
+            },
+            "description": "Elimina un horario semanal"
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de horarios semanales de canchas"
+    },
+    {
+      "name": "Court Availability",
+      "item": [
+        {
+          "name": "Consultar disponibilidad de cancha",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/courts/:courtId/availability?date=2024-12-25",
+              "host": ["{{base_url}}"],
+              "path": ["courts", ":courtId", "availability"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2024-12-25",
+                  "description": "Fecha en formato YYYY-MM-DD"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "courtId",
+                  "value": "",
+                  "description": "ID de la cancha"
+                }
+              ]
+            },
+            "description": "Obtiene los slots de tiempo disponibles para una cancha en una fecha específica.\n\nEl sistema calcula la disponibilidad basándose en:\n1. El horario base semanal (CourtSchedule)\n2. Los bloqueos y excepciones del día (CourtAvailability)\n3. Fusiona automáticamente slots contiguos"
+          },
+          "response": []
+        },
+        {
+          "name": "Crear excepción de disponibilidad",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2024-12-25\",\n  \"startTime\": \"10:00\",\n  \"endTime\": \"14:00\",\n  \"type\": \"BLOCKED\",\n  \"reason\": \"Mantenimiento de cancha\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/courts/:courtId/availability-exceptions",
+              "host": ["{{base_url}}"],
+              "path": ["courts", ":courtId", "availability-exceptions"],
+              "variable": [
+                {
+                  "key": "courtId",
+                  "value": "",
+                  "description": "ID de la cancha"
+                }
+              ]
+            },
+            "description": "Crea una excepción de disponibilidad (bloqueo o disponibilidad especial).\n\nTipos:\n- BLOCKED: Bloquea el horario\n- AVAILABLE: Agrega disponibilidad especial"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar excepciones de disponibilidad",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/courts/:courtId/availability-exceptions",
+              "host": ["{{base_url}}"],
+              "path": ["courts", ":courtId", "availability-exceptions"],
+              "variable": [
+                {
+                  "key": "courtId",
+                  "value": "",
+                  "description": "ID de la cancha"
+                }
+              ]
+            },
+            "description": "Obtiene todas las excepciones de disponibilidad de una cancha"
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar excepción de disponibilidad",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/courts/availability-exceptions/:availabilityId",
+              "host": ["{{base_url}}"],
+              "path": ["courts", "availability-exceptions", ":availabilityId"],
+              "variable": [
+                {
+                  "key": "availabilityId",
+                  "value": "",
+                  "description": "ID de la excepción"
+                }
+              ]
+            },
+            "description": "Elimina una excepción de disponibilidad"
+          },
+          "response": []
+        }
+      ],
+      "description": "Consulta y gestión de disponibilidad de canchas"
+    },
+    {
+      "name": "Court Pricing",
+      "item": [
+        {
+          "name": "Crear regla de precio",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pricingType\": \"PER_HOUR\",\n  \"price\": 50000,\n  \"minDurationMinutes\": 60,\n  \"maxDurationMinutes\": 120,\n  \"maxPlayers\": 4\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/courts/:courtId/pricing-rules",
+              "host": ["{{base_url}}"],
+              "path": ["courts", ":courtId", "pricing-rules"],
+              "variable": [
+                {
+                  "key": "courtId",
+                  "value": "",
+                  "description": "ID de la cancha"
+                }
+              ]
+            },
+            "description": "Crea una regla de precio para una cancha.\n\nTipos de precio:\n- PER_HOUR: Precio por hora\n- PER_PERSON: Precio por persona por hora\n\nNota: Los precios están en centavos (50000 = $500.00)"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar reglas de precio",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/courts/:courtId/pricing-rules",
+              "host": ["{{base_url}}"],
+              "path": ["courts", ":courtId", "pricing-rules"],
+              "variable": [
+                {
+                  "key": "courtId",
+                  "value": "",
+                  "description": "ID de la cancha"
+                }
+              ]
+            },
+            "description": "Obtiene todas las reglas de precio de una cancha"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar regla de precio",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 60000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/courts/pricing-rules/:ruleId",
+              "host": ["{{base_url}}"],
+              "path": ["courts", "pricing-rules", ":ruleId"],
+              "variable": [
+                {
+                  "key": "ruleId",
+                  "value": "",
+                  "description": "ID de la regla de precio"
+                }
+              ]
+            },
+            "description": "Actualiza una regla de precio existente"
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar regla de precio",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/courts/pricing-rules/:ruleId",
+              "host": ["{{base_url}}"],
+              "path": ["courts", "pricing-rules", ":ruleId"],
+              "variable": [
+                {
+                  "key": "ruleId",
+                  "value": "",
+                  "description": "ID de la regla de precio"
+                }
+              ]
+            },
+            "description": "Elimina una regla de precio"
+          },
+          "response": []
+        },
+        {
+          "name": "Calcular precio de reserva",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"durationMinutes\": 90,\n  \"playersCount\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/courts/:courtId/calculate-price",
+              "host": ["{{base_url}}"],
+              "path": ["courts", ":courtId", "calculate-price"],
+              "variable": [
+                {
+                  "key": "courtId",
+                  "value": "",
+                  "description": "ID de la cancha"
+                }
+              ]
+            },
+            "description": "Calcula el precio de una reserva según las reglas de precio configuradas"
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de precios de canchas"
+    }
+  ]
+}

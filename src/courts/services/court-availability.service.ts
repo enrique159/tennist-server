@@ -1,9 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Court } from '../entities/court.entity';
 import { CourtSchedule } from '../entities/court-schedule.entity';
 import { CourtAvailability, AvailabilityType } from '../entities/court-availability.entity';
+import { Venue } from '@/venues/venue.entity';
+import { CreateCourtAvailabilityDto } from '../dto/create-court-availability.dto';
+import { Role } from '@/users/domain/user';
 
 export interface TimeSlot {
   startTime: string;
@@ -19,6 +22,8 @@ export class CourtAvailabilityService {
     private scheduleRepository: Repository<CourtSchedule>,
     @InjectRepository(CourtAvailability)
     private availabilityRepository: Repository<CourtAvailability>,
+    @InjectRepository(Venue)
+    private venueRepository: Repository<Venue>,
   ) {}
 
   /**
@@ -153,5 +158,102 @@ export class CourtAvailabilityService {
   private timeToMinutes(time: string): number {
     const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
+  }
+
+  /**
+   * @description Crea una excepción de disponibilidad (bloqueo o disponibilidad especial)
+   * @param { string } courtId - ID de la cancha
+   * @param { CreateCourtAvailabilityDto } createAvailabilityDto - Datos de la excepción
+   * @param { any } currentUser - Usuario actual que realiza la acción
+   * @returns { Promise<CourtAvailability> } Excepción creada
+   */
+  async createException(
+    courtId: string,
+    createAvailabilityDto: CreateCourtAvailabilityDto,
+    currentUser: any,
+  ): Promise<CourtAvailability> {
+    const court = await this.courtRepository.findOne({
+      where: { id: courtId },
+      relations: ['venue'],
+    });
+
+    if (!court) {
+      throw new NotFoundException(`Cancha con ID ${courtId} no encontrada`);
+    }
+
+    const venue = await this.venueRepository.findOne({
+      where: { id: court.venueId },
+    });
+
+    if (currentUser.role !== Role.ADMIN && venue.ownerUserId !== currentUser.id) {
+      throw new ForbiddenException('No tienes permiso para gestionar la disponibilidad de esta cancha');
+    }
+
+    this.validateTimeRange(createAvailabilityDto.startTime, createAvailabilityDto.endTime);
+
+    const availability = this.availabilityRepository.create({
+      ...createAvailabilityDto,
+      courtId,
+    });
+
+    return await this.availabilityRepository.save(availability);
+  }
+
+  /**
+   * @description Obtiene todas las excepciones de disponibilidad de una cancha
+   * @param { string } courtId - ID de la cancha
+   * @returns { Promise<CourtAvailability[]> } Lista de excepciones
+   */
+  async findExceptionsByCourtId(courtId: string): Promise<CourtAvailability[]> {
+    const court = await this.courtRepository.findOne({ where: { id: courtId } });
+
+    if (!court) {
+      throw new NotFoundException(`Cancha con ID ${courtId} no encontrada`);
+    }
+
+    return await this.availabilityRepository.find({
+      where: { courtId },
+      order: { date: 'ASC', startTime: 'ASC' },
+    });
+  }
+
+  /**
+   * @description Elimina una excepción de disponibilidad
+   * @param { string } availabilityId - ID de la excepción
+   * @param { any } currentUser - Usuario actual que realiza la acción
+   * @returns { Promise<void> }
+   */
+  async deleteException(availabilityId: string, currentUser: any): Promise<void> {
+    const availability = await this.availabilityRepository.findOne({
+      where: { id: availabilityId },
+      relations: ['court', 'court.venue'],
+    });
+
+    if (!availability) {
+      throw new NotFoundException(`Excepción de disponibilidad con ID ${availabilityId} no encontrada`);
+    }
+
+    const venue = availability.court.venue;
+
+    if (currentUser.role !== Role.ADMIN && venue.ownerUserId !== currentUser.id) {
+      throw new ForbiddenException('No tienes permiso para eliminar esta excepción');
+    }
+
+    await this.availabilityRepository.remove(availability);
+  }
+
+  /**
+   * @description Valida que el rango de tiempo sea correcto
+   * @param { string } startTime - Hora de inicio
+   * @param { string } endTime - Hora de fin
+   * @returns { void }
+   */
+  private validateTimeRange(startTime: string, endTime: string): void {
+    const start = this.timeToMinutes(startTime);
+    const end = this.timeToMinutes(endTime);
+
+    if (start >= end) {
+      throw new BadRequestException('La hora de inicio debe ser anterior a la hora de fin');
+    }
   }
 }

@@ -182,6 +182,47 @@ Content-Type: application/json
 }
 ```
 
+#### Buscar venues cercanos
+```http
+GET /venues/nearby?lat=19.4326&lng=-99.1332&radiusKm=5&type=PUBLIC&status=active
+Authorization: Bearer <token>
+```
+
+**Parámetros de query:**
+- `lat` (requerido): Latitud de tu ubicación actual
+- `lng` (requerido): Longitud de tu ubicación actual
+- `radiusKm` (opcional): Radio de búsqueda en kilómetros (por defecto: 10 km, máximo: 100 km)
+- `type` (opcional): Tipo de venue (`PUBLIC` o `PRIVATE`)
+- `status` (opcional): Estado del venue (`active`, `inactive`, `deleted`). Por defecto solo muestra activos
+
+**Respuesta exitosa:**
+```json
+[
+  {
+    "id": "uuid",
+    "name": "Club Deportivo Central",
+    "description": "Club de tenis con instalaciones de primer nivel",
+    "address": "Av. Principal 123, Ciudad",
+    "lat": 19.4326,
+    "lng": -99.1332,
+    "type": "PRIVATE",
+    "status": "active",
+    "distance": 2.45,
+    "courts": [
+      {
+        "id": "uuid",
+        "name": "Cancha 1",
+        "surface": "CLAY",
+        "isIndoor": false,
+        "isLighted": true
+      }
+    ]
+  }
+]
+```
+
+**Nota:** Los resultados están ordenados por distancia (más cercano primero) y cada venue incluye el campo `distance` en kilómetros.
+
 #### Obtener venue por ID
 ```http
 GET /venues/:id
@@ -304,6 +345,169 @@ Authorization: Bearer <token>
 1. El horario base semanal (`CourtSchedule`)
 2. Los bloqueos y excepciones del día (`CourtAvailability`)
 3. Fusiona automáticamente slots contiguos
+
+---
+
+### ⏰ Gestión de Horarios (CourtSchedule)
+
+#### Crear horario semanal
+```http
+POST /courts/:courtId/schedules
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "dayOfWeek": 1,
+  "startTime": "08:00",
+  "endTime": "20:00"
+}
+```
+
+**Parámetros:**
+- `dayOfWeek`: Día de la semana (0=Domingo, 1=Lunes, ..., 6=Sábado)
+- `startTime`: Hora de inicio en formato HH:MM
+- `endTime`: Hora de fin en formato HH:MM
+
+**Permisos requeridos:**
+- Usuario debe ser propietario del venue o ADMIN
+
+#### Listar horarios de una cancha
+```http
+GET /courts/:courtId/schedules
+Authorization: Bearer <token>
+```
+
+#### Actualizar horario
+```http
+PUT /courts/schedules/:scheduleId
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "startTime": "09:00",
+  "endTime": "21:00"
+}
+```
+
+#### Eliminar horario
+```http
+DELETE /courts/schedules/:scheduleId
+Authorization: Bearer <token>
+```
+
+---
+
+### 🚫 Gestión de Excepciones de Disponibilidad
+
+#### Crear excepción (bloqueo o disponibilidad especial)
+```http
+POST /courts/:courtId/availability-exceptions
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "date": "2024-12-25",
+  "startTime": "10:00",
+  "endTime": "14:00",
+  "type": "BLOCKED",
+  "reason": "Mantenimiento de cancha"
+}
+```
+
+**Tipos de excepción:**
+- `BLOCKED`: Bloquea el horario (ej: mantenimiento, evento privado)
+- `AVAILABLE`: Agrega disponibilidad especial fuera del horario normal
+
+**Permisos requeridos:**
+- Usuario debe ser propietario del venue o ADMIN
+
+#### Listar excepciones de una cancha
+```http
+GET /courts/:courtId/availability-exceptions
+Authorization: Bearer <token>
+```
+
+#### Eliminar excepción
+```http
+DELETE /courts/availability-exceptions/:availabilityId
+Authorization: Bearer <token>
+```
+
+---
+
+### 💰 Gestión de Precios
+
+#### Crear regla de precio
+```http
+POST /courts/:courtId/pricing-rules
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "pricingType": "PER_HOUR",
+  "price": 50000,
+  "minDurationMinutes": 60,
+  "maxDurationMinutes": 120,
+  "maxPlayers": 4
+}
+```
+
+**Tipos de precio:**
+- `PER_HOUR`: Precio por hora de uso
+- `PER_PERSON`: Precio por persona por hora
+
+**Nota:** Los precios se manejan en **centavos** (50000 = $500.00)
+
+**Permisos requeridos:**
+- Usuario debe ser propietario del venue o ADMIN
+
+#### Listar reglas de precio
+```http
+GET /courts/:courtId/pricing-rules
+Authorization: Bearer <token>
+```
+
+#### Actualizar regla de precio
+```http
+PUT /courts/pricing-rules/:ruleId
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "price": 60000
+}
+```
+
+#### Eliminar regla de precio
+```http
+DELETE /courts/pricing-rules/:ruleId
+Authorization: Bearer <token>
+```
+
+#### Calcular precio de reserva
+```http
+POST /courts/:courtId/calculate-price
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "durationMinutes": 90,
+  "playersCount": 2
+}
+```
+
+**Respuesta exitosa:**
+```json
+{
+  "totalPriceCents": 75000,
+  "appliedRule": {
+    "id": "uuid",
+    "pricingType": "PER_HOUR",
+    "price": 50000,
+    "minDurationMinutes": 60
+  }
+}
+```
 
 ---
 
