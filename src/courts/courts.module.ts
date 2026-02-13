@@ -13,6 +13,7 @@ import { CourtScheduleController } from './controllers/court-schedule.controller
 import { CourtAvailabilityController } from './controllers/court-availability.controller';
 import { CourtPricingController } from './controllers/court-pricing.controller';
 import { VenuesModule } from '@/venues/venues.module';
+import { CourtReservation } from '@/reservations/entities/court-reservation.entity';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { VenuesModule } from '@/venues/venues.module';
       CourtSchedule,
       CourtAvailability,
       CourtPricingRule,
+      CourtReservation,
     ]),
     VenuesModule,
   ],

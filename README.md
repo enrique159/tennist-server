@@ -13,6 +13,7 @@ Tennist Server es el backend del proyecto Tennist, construido con **NestJS**, **
 - 🏟️ **Gestión de venues y canchas** (públicos y privados)
 - 📅 **Sistema de disponibilidad y horarios** para canchas
 - 💰 **Reglas de precios flexibles** (por hora, por persona)
+- 📋 **Sistema de reservas** con validación de disponibilidad y cálculo automático de precios
 - 🎯 **Arquitectura modular** con separación de responsabilidades
 
 ## 🛠️ Stack Tecnológico
@@ -563,6 +564,90 @@ Content-Type: application/json
 
 ---
 
+### 📋 Reservas (Court Reservations)
+
+#### Tipos de origen (sourceType)
+
+Las reservas soportan distintos tipos de origen para integrarse con otros módulos:
+
+| sourceType | sourceId | Descripción |
+|------------|----------|-------------|
+| `USER` | `null` | Reserva creada por un usuario desde la API |
+| `CLASS` | `classSessionId` | Reserva creada por el módulo de clases |
+| `TOURNAMENT` | `tournamentId` | Reserva creada por el módulo de torneos |
+| `MAINTENANCE` | `null` | Bloqueo por mantenimiento |
+
+#### Crear reserva
+```http
+POST /courts/:courtId/reservations
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "date": "2024-12-25",
+  "startTime": "10:00",
+  "endTime": "11:30",
+  "playersCount": 2
+}
+```
+
+**Permisos:** Cualquier usuario autenticado (PLAYER, COACH, CLUB_OWNER, ADMIN)
+
+**Validaciones:**
+- La cancha debe existir y estar activa
+- El horario debe estar dentro de la disponibilidad real
+- No debe haber reservas confirmadas que se solapen
+- La duración y cantidad de jugadores deben respetar las reglas de precio
+
+**Respuesta exitosa:**
+```json
+{
+  "id": "uuid",
+  "courtId": "uuid",
+  "userId": "uuid",
+  "date": "2024-12-25",
+  "startTime": "10:00",
+  "endTime": "11:30",
+  "playersCount": 2,
+  "totalPrice": 75000,
+  "status": "CONFIRMED",
+  "sourceType": "USER",
+  "sourceId": null,
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "court": { ... },
+  "user": { ... }
+}
+```
+
+**Nota:** Las reservas creadas desde la API siempre usan `sourceType = USER`. Las reservas de tipo CLASS, TOURNAMENT y MAINTENANCE se crean internamente mediante `createSystemReservation()`.
+
+#### Obtener mis reservas
+```http
+GET /users/me/reservations
+Authorization: Bearer <token>
+```
+
+**Respuesta:** Lista de reservas del usuario autenticado, ordenadas por fecha descendente. Incluye información de la cancha y el venue.
+
+#### Cancelar reserva
+```http
+DELETE /reservations/:id
+Authorization: Bearer <token>
+```
+
+**Reglas de cancelación por sourceType:**
+
+| sourceType | Quién puede cancelar |
+|------------|---------------------|
+| `USER` | Creador de la reserva, ADMIN, CLUB_OWNER del venue |
+| `CLASS` | Solo el módulo de clases (vía `cancelSystemReservation`) |
+| `TOURNAMENT` | Solo el módulo de torneos (vía `cancelSystemReservation`) |
+| `MAINTENANCE` | ADMIN o CLUB_OWNER del venue |
+
+**Integración con disponibilidad:** Todas las reservas CONFIRMED se descuentan automáticamente de los slots disponibles en `GET /courts/:courtId/availability`, independientemente del `sourceType`.
+
+---
+
 ## 🏗️ Arquitectura del Proyecto
 
 ### Estructura de Directorios
@@ -582,6 +667,11 @@ src/
 │   ├── services/      # Servicios de negocio
 │   ├── controllers/   # Controladores REST
 │   └── dto/
+├── reservations/       # Módulo de reservas
+│   ├── entities/      # CourtReservation
+│   ├── dto/
+│   ├── reservations.service.ts
+│   └── reservations.controller.ts
 ├── shared/             # Recursos compartidos
 │   ├── guards/        # Guards globales
 │   ├── decorators/    # Decoradores personalizados
@@ -594,9 +684,10 @@ src/
 
 1. **User Domain**: Usuarios, roles, autenticación
 2. **Infrastructure Domain**: Venues, canchas, horarios, disponibilidad, precios
-3. **Sports Domain**: Partidos, estadísticas, prácticas (futuro)
-4. **Social Domain**: Amigos, invitaciones, posts (futuro)
-5. **Coaching Domain**: Coaches, clases, cursos (futuro)
+3. **Reservation Domain**: Reservas de canchas, cancelaciones
+4. **Sports Domain**: Partidos, estadísticas, prácticas (futuro)
+5. **Social Domain**: Amigos, invitaciones, posts (futuro)
+6. **Coaching Domain**: Coaches, clases, cursos (futuro)
 
 ### Sistema de Roles
 

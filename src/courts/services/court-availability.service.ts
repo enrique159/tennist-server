@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Court } from '../entities/court.entity';
 import { CourtSchedule } from '../entities/court-schedule.entity';
 import { CourtAvailability, AvailabilityType } from '../entities/court-availability.entity';
+import { CourtReservation, ReservationStatus } from '@/reservations/entities/court-reservation.entity';
 import { Venue } from '@/venues/venue.entity';
 import { CreateCourtAvailabilityDto } from '../dto/create-court-availability.dto';
 import { Role } from '@/users/domain/user';
@@ -24,6 +25,8 @@ export class CourtAvailabilityService {
     private availabilityRepository: Repository<CourtAvailability>,
     @InjectRepository(Venue)
     private venueRepository: Repository<Venue>,
+    @InjectRepository(CourtReservation)
+    private reservationRepository: Repository<CourtReservation>,
   ) {}
 
   /**
@@ -75,6 +78,24 @@ export class CourtAvailabilityService {
           override.endTime,
         );
       }
+    }
+
+    // Remover reservas confirmadas de los slots disponibles
+    const confirmedReservations = await this.reservationRepository.find({
+      where: {
+        courtId,
+        date,
+        status: ReservationStatus.CONFIRMED,
+      },
+      order: { startTime: 'ASC' },
+    });
+
+    for (const reservation of confirmedReservations) {
+      availableSlots = this.removeTimeSlot(
+        availableSlots,
+        reservation.startTime,
+        reservation.endTime,
+      );
     }
 
     return availableSlots;

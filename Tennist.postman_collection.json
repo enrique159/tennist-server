@@ -956,6 +956,107 @@
         }
       ],
       "description": "Gestión de precios de canchas"
+    },
+    {
+      "name": "Reservations",
+      "item": [
+        {
+          "name": "Crear reserva",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2024-12-25\",\n  \"startTime\": \"10:00\",\n  \"endTime\": \"11:30\",\n  \"playersCount\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/courts/:courtId/reservations",
+              "host": ["{{base_url}}"],
+              "path": ["courts", ":courtId", "reservations"],
+              "variable": [
+                {
+                  "key": "courtId",
+                  "value": "",
+                  "description": "ID de la cancha"
+                }
+              ]
+            },
+            "description": "Crea una nueva reserva para una cancha.\n\nValidaciones:\n- La cancha debe existir y estar activa\n- El horario debe estar dentro de la disponibilidad real\n- No debe haber reservas confirmadas que se solapen\n- Duración y jugadores deben respetar reglas de precio\n\nEl precio se calcula automáticamente."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener mis reservas",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/me/reservations",
+              "host": ["{{base_url}}"],
+              "path": ["users", "me", "reservations"]
+            },
+            "description": "Obtiene todas las reservas del usuario autenticado, ordenadas por fecha descendente. Incluye información de la cancha y el venue."
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar reserva",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reservations/:id",
+              "host": ["{{base_url}}"],
+              "path": ["reservations", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "ID de la reserva"
+                }
+              ]
+            },
+            "description": "Cancela una reserva existente.\n\nPermisos:\n- El usuario que creó la reserva\n- ADMIN\n- El CLUB_OWNER del venue"
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de reservas de canchas"
     }
   ]
 }
