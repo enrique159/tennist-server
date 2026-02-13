@@ -7,6 +7,7 @@ import { AuthGuard } from '@/auth/auth.guard';
 import { RolesGuard } from '@/shared/guards/roles.guard';
 import { Roles } from '@/shared/decorators/roles.decorator';
 import { Role } from '@/users/domain/user';
+import { MetaPage } from '@/shared/domain/pagination';
 
 @Controller('venues')
 @UseGuards(AuthGuard)
@@ -35,7 +36,10 @@ export class VenuesController {
   }
 
   @Get('nearby')
-  async getNearbyVenues(@Query() filters: FindNearbyVenuesDto): Promise<Array<Venue & { distance: number }>> {
+  async getNearbyVenues(@Query() filters: FindNearbyVenuesDto): Promise<{
+    data: Array<Venue & { distance: number }>;
+    meta: MetaPage;
+  }> {
     return this.venuesService.findNearby(filters);
   }
 

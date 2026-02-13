@@ -1,10 +1,11 @@
 export type MetaPage = {
-  totalItems: number;
-  totalPages: number;
-  page: number;
-  offset: number;
-  endOffset: number;
-  limit: number;
+  totalItems?: number;
+  totalPages?: number;
+  page?: number;
+  offset?: number;
+  endOffset?: number;
+  limit?: number;
+  hasMore?: boolean;
 };
 
 export type PageFilters = {

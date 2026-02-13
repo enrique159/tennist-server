@@ -5,6 +5,7 @@ import { Venue, VenueType } from './venue.entity';
 import { CreateVenueDto } from './dto/create-venue.dto';
 import { FindNearbyVenuesDto } from './dto/find-nearby-venues.dto';
 import { BaseStatus } from '@/shared/domain/status';
+import { MetaPage } from '@/shared/domain/pagination';
 
 @Injectable()
 export class VenuesService {
@@ -77,12 +78,15 @@ export class VenuesService {
   }
 
   /**
-   * @description Busca venues cercanos a una ubicación con filtros opcionales
-   * @param { FindNearbyVenuesDto } filters - Filtros de búsqueda (lat, lng, radio, tipo, estado)
-   * @returns { Promise<Array<Venue & { distance: number }>> } Lista de venues con distancia en km
+   * @description Busca venues cercanos a una ubicación con filtros opcionales y paginación
+   * @param { FindNearbyVenuesDto } filters - Filtros de búsqueda (lat, lng, radio, tipo, estado, all, page, limit)
+   * @returns { Promise<{ data: Array<Venue & { distance: number }>, meta: MetaPage }> } Respuesta paginada de venues
    */
-  async findNearby(filters: FindNearbyVenuesDto): Promise<Array<Venue & { distance: number }>> {
-    const { lat, lng, radiusKm = 10, type, status } = filters;
+  async findNearby(filters: FindNearbyVenuesDto): Promise<{
+    data: Array<Venue & { distance: number }>;
+    meta: MetaPage;
+  }> {
+    const { lat, lng, radiusKm = 10, type, status, all = false, page = 1, limit = 10 } = filters;
 
     // Construir query base
     const queryBuilder = this.venueRepository
@@ -106,19 +110,46 @@ export class VenuesService {
     // Obtener todos los venues que cumplen los filtros
     const venues = await queryBuilder.getMany();
 
-    // Calcular distancia para cada venue y filtrar por radio
-    const venuesWithDistance = venues
-      .map((venue) => {
-        const distance = this.calculateDistance(lat, lng, venue.lat, venue.lng);
-        return {
-          ...venue,
-          distance: parseFloat(distance.toFixed(2)),
-        };
-      })
-      .filter((venue) => venue.distance <= radiusKm)
-      .sort((a, b) => a.distance - b.distance);
+    let venuesWithDistance: Array<Venue & { distance: number }>;
 
-    return venuesWithDistance;
+    if (all) {
+      // Modo 'all': retornar todos sin filtrar por coordenadas
+      venuesWithDistance = venues
+        .map((venue) => {
+          const distance = lat != null && lng != null
+            ? parseFloat(this.calculateDistance(lat, lng, venue.lat, venue.lng).toFixed(2))
+            : 0;
+          return { ...venue, distance };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      // Modo cercano: filtrar por radio y ordenar por distancia
+      venuesWithDistance = venues
+        .map((venue) => {
+          const distance = this.calculateDistance(lat, lng, venue.lat, venue.lng);
+          return {
+            ...venue,
+            distance: parseFloat(distance.toFixed(2)),
+          };
+        })
+        .filter((venue) => venue.distance <= radiusKm)
+        .sort((a, b) => a.distance - b.distance);
+    }
+
+    // Paginación
+    const total = venuesWithDistance.length;
+    const offset = (page - 1) * limit;
+    const paginatedData = venuesWithDistance.slice(offset, offset + limit);
+
+    return {
+      data: paginatedData,
+      meta: {
+        totalItems: total,
+        page,
+        limit,
+        hasMore: offset + limit < total,
+      },
+    };
   }
 
   /**

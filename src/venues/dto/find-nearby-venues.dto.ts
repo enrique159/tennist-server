@@ -1,9 +1,10 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsEnum, Min, Max } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsOptional, IsEnum, IsBoolean, Min, Max, ValidateIf } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 import { VenueType } from '../venue.entity';
 import { BaseStatus } from '@/shared/domain/status';
 
 export class FindNearbyVenuesDto {
+  @ValidateIf((o) => !o.all)
   @IsNumber()
   @IsNotEmpty()
   @Type(() => Number)
@@ -11,6 +12,7 @@ export class FindNearbyVenuesDto {
   @Max(90)
   lat: number;
 
+  @ValidateIf((o) => !o.all)
   @IsNumber()
   @IsNotEmpty()
   @Type(() => Number)
@@ -32,4 +34,22 @@ export class FindNearbyVenuesDto {
   @IsEnum(BaseStatus)
   @IsOptional()
   status?: BaseStatus;
+
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  all?: boolean = false;
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  @Min(1)
+  page?: number = 1;
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  @Min(1)
+  @Max(50)
+  limit?: number = 10;
 }
