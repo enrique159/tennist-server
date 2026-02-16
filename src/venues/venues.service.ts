@@ -114,7 +114,7 @@ export class VenuesService {
     data: Array<Venue & { distance: number }>;
     meta: MetaPage;
   }> {
-    const { lat, lng, radiusKm = 10, type, status, all = false, page = 1, limit = 10 } = filters;
+    const { search, lat, lng, radiusKm = 10, type, status, all = false, page = 1, limit = 10 } = filters;
 
     // Construir query base
     const queryBuilder = this.venueRepository
@@ -124,6 +124,10 @@ export class VenuesService {
       .addOrderBy('images.display_order', 'ASC');
 
     // Aplicar filtros opcionales
+    if (search) {
+      queryBuilder.andWhere('venue.name LIKE :search', { search: `%${search}%` });
+    }
+
     if (type) {
       queryBuilder.andWhere('venue.type = :type', { type });
     }

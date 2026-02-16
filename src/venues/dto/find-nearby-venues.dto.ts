@@ -1,9 +1,13 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsEnum, IsBoolean, Min, Max, ValidateIf } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsEnum, IsBoolean, Min, Max, ValidateIf, IsString } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { VenueType } from '../venue.entity';
 import { BaseStatus } from '@/shared/domain/status';
 
 export class FindNearbyVenuesDto {
+  @IsOptional()
+  @IsString()
+  search?: string;
+
   @ValidateIf((o) => !o.all)
   @IsNumber()
   @IsNotEmpty()
