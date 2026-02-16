@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Venue, VenueType } from './venue.entity';
 import { CreateVenueDto } from './dto/create-venue.dto';
+import { UpdateVenueDto } from './dto/update-venue.dto';
 import { FindNearbyVenuesDto } from './dto/find-nearby-venues.dto';
 import { BaseStatus } from '@/shared/domain/status';
 import { MetaPage } from '@/shared/domain/pagination';
@@ -24,8 +25,11 @@ export class VenuesService {
       throw new BadRequestException('Este método solo crea venues PÚBLICOS');
     }
 
+    const alias = await this.resolveVenueAlias(createVenueDto.alias);
+
     const venue = this.venueRepository.create({
       ...createVenueDto,
+      alias,
       createdByAdmin: true,
       ownerUserId: null,
       status: BaseStatus.ACTIVE,
@@ -49,8 +53,11 @@ export class VenuesService {
       throw new BadRequestException('El ID del usuario propietario es requerido para venues privados');
     }
 
+    const alias = await this.resolveVenueAlias(createVenueDto.alias);
+
     const venue = this.venueRepository.create({
       ...createVenueDto,
+      alias,
       ownerUserId,
       createdByAdmin: false,
       status: BaseStatus.ACTIVE,
@@ -75,6 +82,27 @@ export class VenuesService {
     }
 
     return venue;
+  }
+
+  /**
+   * @description Actualiza la información de un venue existente
+   * @param { string } id - ID del venue
+   * @param { UpdateVenueDto } updateVenueDto - Datos a actualizar
+   * @returns { Promise<Venue> } Venue actualizado
+   */
+  async updateVenue(id: string, updateVenueDto: UpdateVenueDto): Promise<Venue> {
+    const venue = await this.findById(id);
+
+    if (updateVenueDto.alias) {
+      venue.alias = await this.resolveVenueAlias(updateVenueDto.alias, id);
+    }
+
+    Object.assign(venue, {
+      ...updateVenueDto,
+      alias: venue.alias,
+    });
+
+    return await this.venueRepository.save(venue);
   }
 
   /**
@@ -119,7 +147,7 @@ export class VenuesService {
           const distance = lat != null && lng != null
             ? parseFloat(this.calculateDistance(lat, lng, venue.lat, venue.lng).toFixed(2))
             : 0;
-          return { ...venue, distance };
+          return Object.assign(venue, { distance }) as Venue & { distance: number };
         })
         .sort((a, b) => a.name.localeCompare(b.name));
     } else {
@@ -127,10 +155,9 @@ export class VenuesService {
       venuesWithDistance = venues
         .map((venue) => {
           const distance = this.calculateDistance(lat, lng, venue.lat, venue.lng);
-          return {
-            ...venue,
+          return Object.assign(venue, {
             distance: parseFloat(distance.toFixed(2)),
-          };
+          }) as Venue & { distance: number };
         })
         .filter((venue) => venue.distance <= radiusKm)
         .sort((a, b) => a.distance - b.distance);
@@ -185,5 +212,30 @@ export class VenuesService {
    */
   private degreesToRadians(degrees: number): number {
     return degrees * (Math.PI / 180);
+  }
+
+  /**
+   * @description Obtiene un alias único para venue (valida el proporcionado o genera uno automático)
+   * @param { string | undefined } alias - Alias solicitado por el cliente
+   * @returns { Promise<string> } Alias único
+   */
+  private async resolveVenueAlias(alias?: string, currentVenueId?: string): Promise<string> {
+    if (alias) {
+      const existingVenue = await this.venueRepository.findOne({ where: { alias } });
+      if (existingVenue && existingVenue.id !== currentVenueId) {
+        throw new BadRequestException('El alias ya está en uso');
+      }
+      return alias;
+    }
+
+    let generatedAlias = Venue.generateRandomAlias();
+    let existingVenue = await this.venueRepository.findOne({ where: { alias: generatedAlias } });
+
+    while (existingVenue) {
+      generatedAlias = Venue.generateRandomAlias();
+      existingVenue = await this.venueRepository.findOne({ where: { alias: generatedAlias } });
+    }
+
+    return generatedAlias;
   }
 }

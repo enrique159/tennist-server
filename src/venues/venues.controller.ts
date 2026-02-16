@@ -1,6 +1,7 @@
-import { Controller, Post, Get, Param, Body, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Put, Param, Body, Query, UseGuards, Request } from '@nestjs/common';
 import { VenuesService } from './venues.service';
 import { CreateVenueDto } from './dto/create-venue.dto';
+import { UpdateVenueDto } from './dto/update-venue.dto';
 import { FindNearbyVenuesDto } from './dto/find-nearby-venues.dto';
 import { Venue, VenueType } from './venue.entity';
 import { AuthGuard } from '@/auth/auth.guard';
@@ -8,6 +9,7 @@ import { RolesGuard } from '@/shared/guards/roles.guard';
 import { Roles } from '@/shared/decorators/roles.decorator';
 import { Role } from '@/users/domain/user';
 import { MetaPage } from '@/shared/domain/pagination';
+import { VenueOwnershipGuard } from './guards/venue-ownership.guard';
 
 @Controller('venues')
 @UseGuards(AuthGuard)
@@ -41,6 +43,21 @@ export class VenuesController {
     meta: MetaPage;
   }> {
     return this.venuesService.findNearby(filters);
+  }
+
+  @Put(':id')
+  @UseGuards(RolesGuard, VenueOwnershipGuard)
+  @Roles(Role.ADMIN, Role.COURT_OWNER)
+  async updateVenue(
+    @Param('id') id: string,
+    @Body() updateVenueDto: UpdateVenueDto,
+    @Request() req,
+  ): Promise<Venue> {
+    if (updateVenueDto.type === VenueType.PUBLIC && req.user.role !== Role.ADMIN) {
+      throw new Error('Solo usuarios ADMIN pueden asignar tipo de venue PÚBLICO');
+    }
+
+    return this.venuesService.updateVenue(id, updateVenueDto);
   }
 
   @Get(':id')

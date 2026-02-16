@@ -18,7 +18,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:3000",
+      "value": "http://localhost:3333",
       "type": "string"
     },
     {
@@ -33,6 +33,20 @@
       "item": [
         {
           "name": "Registro de usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set(\"auth_token\", jsonData.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -63,7 +77,7 @@
                 "exec": [
                   "if (pm.response.code === 200) {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.collectionVariables.set(\"auth_token\", jsonData.token);",
+                  "    pm.collectionVariables.set(\"auth_token\", jsonData.data.token);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -242,6 +256,46 @@
               ]
             },
             "description": "Obtiene la información de un venue específico incluyendo sus canchas"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar venue",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Club Deportivo Central Renovado\",\n  \"description\": \"Instalaciones renovadas con nuevas canchas\",\n  \"address\": \"Av. Principal 456, Ciudad\",\n  \"lat\": 19.4326,\n  \"lng\": -99.1332,\n  \"type\": \"PRIVATE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/venues/:id",
+              "host": ["{{base_url}}"],
+              "path": ["venues", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "ID del venue"
+                }
+              ]
+            },
+            "description": "Actualiza la información de un venue. Requiere rol ADMIN o COURT_OWNER con permisos sobre el venue."
           },
           "response": []
         }

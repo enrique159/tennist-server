@@ -152,14 +152,25 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
+  "alias": "club_central_01",
   "name": "Club Deportivo Central",
   "description": "Club de tenis con instalaciones de primer nivel",
   "address": "Av. Principal 123, Ciudad",
   "lat": 19.4326,
   "lng": -99.1332,
-  "type": "PRIVATE"
+  "type": "PRIVATE",
+  "facebook": "https://facebook.com/clubdeportivocentral",
+  "instagram": "https://instagram.com/clubdeportivocentral",
+  "url": "https://clubdeportivocentral.com"
 }
 ```
+
+**Campos nuevos importantes:**
+- `alias` (opcional): único, máximo 24 caracteres, formato permitido `[A-Za-z0-9_-]`.
+  - Si no se envía, se genera automáticamente con formato tipo `v19230234238`.
+- `facebook` (opcional): URL válida de Facebook.
+- `instagram` (opcional): URL válida de Instagram.
+- `url` (opcional): URL pública del venue.
 
 **Tipos de venue:**
 - `PUBLIC`: Solo puede ser creado por usuarios ADMIN
@@ -169,6 +180,7 @@ Content-Type: application/json
 ```json
 {
   "id": "uuid",
+  "alias": "club_central_01",
   "name": "Club Deportivo Central",
   "description": "Club de tenis con instalaciones de primer nivel",
   "address": "Av. Principal 123, Ciudad",
@@ -177,52 +189,96 @@ Content-Type: application/json
   "type": "PRIVATE",
   "ownerUserId": "uuid",
   "createdByAdmin": false,
-  "status": "active",
+  "status": "ACTIVE",
+  "facebook": "https://facebook.com/clubdeportivocentral",
+  "instagram": "https://instagram.com/clubdeportivocentral",
+  "url": "https://clubdeportivocentral.com",
   "createdAt": "2024-01-01T00:00:00.000Z",
   "updatedAt": "2024-01-01T00:00:00.000Z"
 }
 ```
 
+#### Actualizar venue
+```http
+PUT /venues/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "alias": "club_central_actualizado",
+  "name": "Club Deportivo Central Renovado",
+  "description": "Nuevas instalaciones y más canchas",
+  "address": "Av. Principal 456, Ciudad",
+  "lat": 19.4328,
+  "lng": -99.1330,
+  "type": "PRIVATE",
+  "facebook": "https://facebook.com/clubcentralrenovado",
+  "instagram": "https://instagram.com/clubcentralrenovado",
+  "url": "https://clubcentralrenovado.com"
+}
+```
+
+**Permisos requeridos:**
+- `ADMIN` puede actualizar cualquier venue.
+- `COURT_OWNER` solo puede actualizar venues de su propiedad.
+
+**Nota:** Si se envía `type: PUBLIC`, solo un usuario `ADMIN` puede realizar esa actualización.
+
 #### Buscar venues cercanos
 ```http
-GET /venues/nearby?lat=19.4326&lng=-99.1332&radiusKm=5&type=PUBLIC&status=active
+GET /venues/nearby?lat=19.4326&lng=-99.1332&radiusKm=5&type=PUBLIC&status=ACTIVE&page=1&limit=10
 Authorization: Bearer <token>
 ```
 
 **Parámetros de query:**
-- `lat` (requerido): Latitud de tu ubicación actual
-- `lng` (requerido): Longitud de tu ubicación actual
+- `lat` (requerido cuando `all=false`): Latitud de tu ubicación actual
+- `lng` (requerido cuando `all=false`): Longitud de tu ubicación actual
 - `radiusKm` (opcional): Radio de búsqueda en kilómetros (por defecto: 10 km, máximo: 100 km)
 - `type` (opcional): Tipo de venue (`PUBLIC` o `PRIVATE`)
-- `status` (opcional): Estado del venue (`active`, `inactive`, `deleted`). Por defecto solo muestra activos
+- `status` (opcional): Estado del venue (`ACTIVE`, `INACTIVE`, `DELETED`). Por defecto solo muestra activos
+- `all` (opcional): Si `true`, ignora coordenadas y radio y lista todos los venues
+- `page` (opcional): Página a consultar (por defecto: 1)
+- `limit` (opcional): Elementos por página (por defecto: 10, máximo: 50)
 
 **Respuesta exitosa:**
 ```json
-[
-  {
-    "id": "uuid",
-    "name": "Club Deportivo Central",
-    "description": "Club de tenis con instalaciones de primer nivel",
-    "address": "Av. Principal 123, Ciudad",
-    "lat": 19.4326,
-    "lng": -99.1332,
-    "type": "PRIVATE",
-    "status": "active",
-    "distance": 2.45,
-    "courts": [
-      {
-        "id": "uuid",
-        "name": "Cancha 1",
-        "surface": "CLAY",
-        "isIndoor": false,
-        "isLighted": true
-      }
-    ]
+{
+  "data": [
+    {
+      "id": "uuid",
+      "alias": "club_central_01",
+      "name": "Club Deportivo Central",
+      "description": "Club de tenis con instalaciones de primer nivel",
+      "address": "Av. Principal 123, Ciudad",
+      "lat": 19.4326,
+      "lng": -99.1332,
+      "type": "PRIVATE",
+      "status": "ACTIVE",
+      "distance": 2.45,
+      "facebook": "https://facebook.com/clubdeportivocentral",
+      "instagram": "https://instagram.com/clubdeportivocentral",
+      "url": "https://clubdeportivocentral.com",
+      "courts": [
+        {
+          "id": "uuid",
+          "name": "Cancha 1",
+          "surface": "CLAY",
+          "isIndoor": false,
+          "isLighted": true
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "totalItems": 25,
+    "page": 1,
+    "limit": 10,
+    "hasMore": true
   }
-]
+}
 ```
 
-**Nota:** Los resultados están ordenados por distancia (más cercano primero) y cada venue incluye el campo `distance` en kilómetros.
+**Nota:** Los resultados incluyen `meta` para paginación. Cuando `all=false` están ordenados por distancia; cuando `all=true` se ordenan por nombre.
 
 #### Obtener venue por ID
 ```http
@@ -234,9 +290,13 @@ Authorization: Bearer <token>
 ```json
 {
   "id": "uuid",
+  "alias": "club_central_01",
   "name": "Club Deportivo Central",
   "address": "Av. Principal 123, Ciudad",
   "type": "PRIVATE",
+  "facebook": "https://facebook.com/clubdeportivocentral",
+  "instagram": "https://instagram.com/clubdeportivocentral",
+  "url": "https://clubdeportivocentral.com",
   "courts": [
     {
       "id": "uuid",

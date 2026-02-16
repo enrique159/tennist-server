@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   OneToMany,
   UpdateDateColumn,
+  BeforeInsert,
 } from 'typeorm';
 import { Court } from '@/courts/entities/court.entity';
 import { VenueImage } from './entities/venue-image.entity';
@@ -19,6 +20,9 @@ export enum VenueType {
 export class Venue {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ unique: true, length: 24 })
+  alias: string;
 
   @Column()
   name: string;
@@ -50,6 +54,15 @@ export class Venue {
   @Column({ type: 'enum', enum: BaseStatus, default: BaseStatus.ACTIVE })
   status: BaseStatus
 
+  @Column({ name: 'facebook_url', nullable: true })
+  facebook?: string;
+
+  @Column({ name: 'instagram_url', nullable: true })
+  instagram?: string;
+
+  @Column({ nullable: true })
+  url?: string;
+
   @OneToMany(() => Court, (court) => court.venue)
   courts: Court[];
 
@@ -61,4 +74,16 @@ export class Venue {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @BeforeInsert()
+  setDefaultAlias() {
+    if (!this.alias) {
+      this.alias = Venue.generateRandomAlias();
+    }
+  }
+
+  static generateRandomAlias(): string {
+    const digits = Math.random().toString().slice(2, 13).padEnd(11, '0').slice(0, 11);
+    return `v${digits}`;
+  }
 }
