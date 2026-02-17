@@ -61,8 +61,13 @@
             },
             "url": {
               "raw": "{{base_url}}/auth/signup",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "signup"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
             },
             "description": "Crea una nueva cuenta de usuario en el sistema"
           },
@@ -98,8 +103,13 @@
             },
             "url": {
               "raw": "{{base_url}}/auth/signin",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "signin"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "signin"
+              ]
             },
             "description": "Inicia sesión y obtiene un token JWT. El token se guarda automáticamente en la variable auth_token."
           },
@@ -137,8 +147,12 @@
             },
             "url": {
               "raw": "{{base_url}}/venues",
-              "host": ["{{base_url}}"],
-              "path": ["venues"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "venues"
+              ]
             },
             "description": "Crea un venue público. Solo usuarios con rol ADMIN pueden crear venues públicos."
           },
@@ -170,8 +184,12 @@
             },
             "url": {
               "raw": "{{base_url}}/venues",
-              "host": ["{{base_url}}"],
-              "path": ["venues"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "venues"
+              ]
             },
             "description": "Crea un venue privado. Usuarios con rol CLUB_OWNER o ADMIN pueden crear venues privados."
           },
@@ -194,8 +212,13 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/venues/nearby?lat=19.4326&lng=-99.1332&radiusKm=10&type=PUBLIC&status=active",
-              "host": ["{{base_url}}"],
-              "path": ["venues", "nearby"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "venues",
+                "nearby"
+              ],
               "query": [
                 {
                   "key": "lat",
@@ -245,8 +268,13 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/venues/:venueId",
-              "host": ["{{base_url}}"],
-              "path": ["venues", ":venueId"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "venues",
+                ":venueId"
+              ],
               "variable": [
                 {
                   "key": "venueId",
@@ -285,8 +313,13 @@
             },
             "url": {
               "raw": "{{base_url}}/venues/:id",
-              "host": ["{{base_url}}"],
-              "path": ["venues", ":id"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "venues",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -333,8 +366,14 @@
             },
             "url": {
               "raw": "{{base_url}}/venues/:venueId/images",
-              "host": ["{{base_url}}"],
-              "path": ["venues", ":venueId", "images"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "venues",
+                ":venueId",
+                "images"
+              ],
               "variable": [
                 {
                   "key": "venueId",
@@ -364,8 +403,14 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/venues/:venueId/images",
-              "host": ["{{base_url}}"],
-              "path": ["venues", ":venueId", "images"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "venues",
+                ":venueId",
+                "images"
+              ],
               "variable": [
                 {
                   "key": "venueId",
@@ -395,8 +440,14 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/venues/images/:imageId",
-              "host": ["{{base_url}}"],
-              "path": ["venues", "images", ":imageId"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "venues",
+                "images",
+                ":imageId"
+              ],
               "variable": [
                 {
                   "key": "imageId",
@@ -435,8 +486,15 @@
             },
             "url": {
               "raw": "{{base_url}}/venues/images/:imageId/order",
-              "host": ["{{base_url}}"],
-              "path": ["venues", "images", ":imageId", "order"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "venues",
+                "images",
+                ":imageId",
+                "order"
+              ],
               "variable": [
                 {
                   "key": "imageId",
@@ -481,8 +539,14 @@
             },
             "url": {
               "raw": "{{base_url}}/venues/:venueId/courts",
-              "host": ["{{base_url}}"],
-              "path": ["venues", ":venueId", "courts"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "venues",
+                ":venueId",
+                "courts"
+              ],
               "variable": [
                 {
                   "key": "venueId",
@@ -512,8 +576,14 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/venues/:venueId/courts",
-              "host": ["{{base_url}}"],
-              "path": ["venues", ":venueId", "courts"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "venues",
+                ":venueId",
+                "courts"
+              ],
               "variable": [
                 {
                   "key": "venueId",
@@ -558,8 +628,14 @@
             },
             "url": {
               "raw": "{{base_url}}/courts/:courtId/schedules",
-              "host": ["{{base_url}}"],
-              "path": ["courts", ":courtId", "schedules"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                ":courtId",
+                "schedules"
+              ],
               "variable": [
                 {
                   "key": "courtId",
@@ -589,8 +665,14 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/courts/:courtId/schedules",
-              "host": ["{{base_url}}"],
-              "path": ["courts", ":courtId", "schedules"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                ":courtId",
+                "schedules"
+              ],
               "variable": [
                 {
                   "key": "courtId",
@@ -629,8 +711,14 @@
             },
             "url": {
               "raw": "{{base_url}}/courts/schedules/:scheduleId",
-              "host": ["{{base_url}}"],
-              "path": ["courts", "schedules", ":scheduleId"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                "schedules",
+                ":scheduleId"
+              ],
               "variable": [
                 {
                   "key": "scheduleId",
@@ -660,8 +748,14 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/courts/schedules/:scheduleId",
-              "host": ["{{base_url}}"],
-              "path": ["courts", "schedules", ":scheduleId"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                "schedules",
+                ":scheduleId"
+              ],
               "variable": [
                 {
                   "key": "scheduleId",
@@ -697,8 +791,14 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/courts/:courtId/availability?date=2024-12-25",
-              "host": ["{{base_url}}"],
-              "path": ["courts", ":courtId", "availability"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                ":courtId",
+                "availability"
+              ],
               "query": [
                 {
                   "key": "date",
@@ -744,8 +844,14 @@
             },
             "url": {
               "raw": "{{base_url}}/courts/:courtId/availability-exceptions",
-              "host": ["{{base_url}}"],
-              "path": ["courts", ":courtId", "availability-exceptions"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                ":courtId",
+                "availability-exceptions"
+              ],
               "variable": [
                 {
                   "key": "courtId",
@@ -775,8 +881,14 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/courts/:courtId/availability-exceptions",
-              "host": ["{{base_url}}"],
-              "path": ["courts", ":courtId", "availability-exceptions"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                ":courtId",
+                "availability-exceptions"
+              ],
               "variable": [
                 {
                   "key": "courtId",
@@ -806,8 +918,14 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/courts/availability-exceptions/:availabilityId",
-              "host": ["{{base_url}}"],
-              "path": ["courts", "availability-exceptions", ":availabilityId"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                "availability-exceptions",
+                ":availabilityId"
+              ],
               "variable": [
                 {
                   "key": "availabilityId",
@@ -852,8 +970,14 @@
             },
             "url": {
               "raw": "{{base_url}}/courts/:courtId/pricing-rules",
-              "host": ["{{base_url}}"],
-              "path": ["courts", ":courtId", "pricing-rules"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                ":courtId",
+                "pricing-rules"
+              ],
               "variable": [
                 {
                   "key": "courtId",
@@ -883,8 +1007,14 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/courts/:courtId/pricing-rules",
-              "host": ["{{base_url}}"],
-              "path": ["courts", ":courtId", "pricing-rules"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                ":courtId",
+                "pricing-rules"
+              ],
               "variable": [
                 {
                   "key": "courtId",
@@ -923,8 +1053,14 @@
             },
             "url": {
               "raw": "{{base_url}}/courts/pricing-rules/:ruleId",
-              "host": ["{{base_url}}"],
-              "path": ["courts", "pricing-rules", ":ruleId"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                "pricing-rules",
+                ":ruleId"
+              ],
               "variable": [
                 {
                   "key": "ruleId",
@@ -954,8 +1090,14 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/courts/pricing-rules/:ruleId",
-              "host": ["{{base_url}}"],
-              "path": ["courts", "pricing-rules", ":ruleId"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                "pricing-rules",
+                ":ruleId"
+              ],
               "variable": [
                 {
                   "key": "ruleId",
@@ -994,8 +1136,14 @@
             },
             "url": {
               "raw": "{{base_url}}/courts/:courtId/calculate-price",
-              "host": ["{{base_url}}"],
-              "path": ["courts", ":courtId", "calculate-price"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                ":courtId",
+                "calculate-price"
+              ],
               "variable": [
                 {
                   "key": "courtId",
@@ -1040,8 +1188,14 @@
             },
             "url": {
               "raw": "{{base_url}}/courts/:courtId/reservations",
-              "host": ["{{base_url}}"],
-              "path": ["courts", ":courtId", "reservations"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courts",
+                ":courtId",
+                "reservations"
+              ],
               "variable": [
                 {
                   "key": "courtId",
@@ -1071,8 +1225,14 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/users/me/reservations",
-              "host": ["{{base_url}}"],
-              "path": ["users", "me", "reservations"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "reservations"
+              ]
             },
             "description": "Obtiene todas las reservas del usuario autenticado, ordenadas por fecha descendente. Incluye información de la cancha y el venue."
           },
@@ -1095,8 +1255,13 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/reservations/:id",
-              "host": ["{{base_url}}"],
-              "path": ["reservations", ":id"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reservations",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -1111,6 +1276,669 @@
         }
       ],
       "description": "Gestión de reservas de canchas"
+    },
+    {
+      "name": "Practices",
+      "description": "Gestión de prácticas del jugador y estadísticas de progreso",
+      "item": [
+        {
+          "name": "Registrar práctica",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"practiceDate\": \"2026-02-16\",\n  \"durationMinutes\": 90,\n  \"playedFriendlyMatch\": true,\n  \"practicedServes\": true,\n  \"venueId\": \"uuid-opcional\",\n  \"sourceType\": \"MANUAL\",\n  \"notes\": \"Sesion enfocada en saque y consistencia\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/me/practices",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "practices"
+              ]
+            },
+            "description": "Registra una práctica manual o de clase. Para sourceType=CLASS debes enviar classAttended=true y classSessionId, y tener asistencia PRESENT."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener mis prácticas",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/me/practices?fromDate=2026-02-01&toDate=2026-02-16&sourceType=MANUAL",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "practices"
+              ],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "2026-02-01",
+                  "description": "Fecha inicial en formato YYYY-MM-DD (opcional)"
+                },
+                {
+                  "key": "toDate",
+                  "value": "2026-02-16",
+                  "description": "Fecha final en formato YYYY-MM-DD (opcional)"
+                },
+                {
+                  "key": "sourceType",
+                  "value": "MANUAL",
+                  "description": "Filtra por MANUAL o CLASS (opcional)"
+                }
+              ]
+            },
+            "description": "Lista las prácticas del usuario autenticado con filtros opcionales."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener estadísticas de prácticas",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/me/practices/stats?fromDate=2026-02-01&toDate=2026-02-16",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "practices",
+                "stats"
+              ],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "2026-02-01",
+                  "description": "Fecha inicial en formato YYYY-MM-DD (opcional)"
+                },
+                {
+                  "key": "toDate",
+                  "value": "2026-02-16",
+                  "description": "Fecha final en formato YYYY-MM-DD (opcional)"
+                }
+              ]
+            },
+            "description": "Obtiene progreso de prácticas: totales, duración, amistosos, saques, rachas y consistencia."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Courses & Classes",
+      "description": "Gestión de cursos, inscripciones y clases para entrenadores/club owners",
+      "item": [
+        {
+          "name": "Crear curso",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Tecnificacion de Saque\",\n  \"description\": \"Curso para mejorar tecnica y consistencia del saque\",\n  \"groupName\": \"Grupo Juvenil A\",\n  \"difficulty\": \"INTERMEDIATE\",\n  \"maxCapacity\": 12,\n  \"startDate\": \"2026-03-01\",\n  \"endDate\": \"2026-05-30\",\n  \"status\": \"DRAFT\",\n  \"venueId\": \"uuid-opcional\",\n  \"schedules\": [\n    {\n      \"dayOfWeek\": 2,\n      \"startTime\": \"18:00\",\n      \"endTime\": \"19:30\"\n    },\n    {\n      \"dayOfWeek\": 4,\n      \"startTime\": \"18:00\",\n      \"endTime\": \"19:30\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/courses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            },
+            "description": "Crea un curso. Requiere rol COACH, COURT_OWNER o ADMIN."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar cursos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/courses?search=saque&difficulty=INTERMEDIATE&status=ACTIVE&page=1&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "saque",
+                  "description": "Texto de búsqueda (opcional)"
+                },
+                {
+                  "key": "difficulty",
+                  "value": "INTERMEDIATE",
+                  "description": "BEGINNER, INTERMEDIATE, ADVANCED, ALL_LEVELS (opcional)"
+                },
+                {
+                  "key": "status",
+                  "value": "ACTIVE",
+                  "description": "DRAFT, ACTIVE, FINISHED, CANCELLED (opcional)"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Página (opcional, default 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Límite (opcional, default 10, max 100)"
+                }
+              ]
+            },
+            "description": "Busca cursos con filtros opcionales y paginación."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener curso por ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/courses/:courseId",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                ":courseId"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "",
+                  "description": "ID del curso"
+                }
+              ]
+            },
+            "description": "Obtiene detalle de un curso específico."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar estado de curso",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/courses/:courseId/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                ":courseId",
+                "status"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "",
+                  "description": "ID del curso"
+                }
+              ]
+            },
+            "description": "Actualiza estado del curso. Solo dueño o ADMIN."
+          },
+          "response": []
+        },
+        {
+          "name": "Solicitar inscripción al curso",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/courses/:courseId/enrollments/request",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                ":courseId",
+                "enrollments",
+                "request"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "",
+                  "description": "ID del curso"
+                }
+              ]
+            },
+            "description": "Jugador solicita unirse a un curso activo."
+          },
+          "response": []
+        },
+        {
+          "name": "Agregar usuario al curso (owner)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"uuid-del-jugador\",\n  \"reviewNotes\": \"Inscripción agregada por entrenador\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/courses/:courseId/enrollments/add-user",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                ":courseId",
+                "enrollments",
+                "add-user"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "",
+                  "description": "ID del curso"
+                }
+              ]
+            },
+            "description": "El dueño del curso agrega un jugador directamente como APPROVED."
+          },
+          "response": []
+        },
+        {
+          "name": "Revisar solicitud de inscripción",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\",\n  \"reviewNotes\": \"Cupo confirmado\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/courses/:courseId/enrollments/:enrollmentId/review",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                ":courseId",
+                "enrollments",
+                ":enrollmentId",
+                "review"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "",
+                  "description": "ID del curso"
+                },
+                {
+                  "key": "enrollmentId",
+                  "value": "",
+                  "description": "ID de la inscripción"
+                }
+              ]
+            },
+            "description": "Aprueba o rechaza una solicitud de inscripción."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar inscripciones de un curso",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/courses/:courseId/enrollments?status=PENDING",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                ":courseId",
+                "enrollments"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "",
+                  "description": "ID del curso"
+                }
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING",
+                  "description": "Filtra por PENDING, APPROVED o REJECTED (opcional)"
+                }
+              ]
+            },
+            "description": "Obtiene inscripciones del curso para gestión del dueño."
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar clase de curso",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-03-10\",\n  \"startTime\": \"18:00\",\n  \"endTime\": \"19:30\",\n  \"generalNotes\": \"Sesión enfocada en segundo saque\",\n  \"attendance\": [\n    {\n      \"userId\": \"uuid-jugador\",\n      \"status\": \"PRESENT\",\n      \"playerNotes\": \"Mejoró la altura del lanzamiento\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/courses/:courseId/classes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                ":courseId",
+                "classes"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "",
+                  "description": "ID del curso"
+                }
+              ]
+            },
+            "description": "Registra clase dictada con asistencia. Requiere curso ACTIVE e iniciado."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar clases de un curso",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/courses/:courseId/classes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                ":courseId",
+                "classes"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "",
+                  "description": "ID del curso"
+                }
+              ]
+            },
+            "description": "Lista todas las clases registradas de un curso."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener mis cursos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/me/courses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "courses"
+              ]
+            },
+            "description": "Lista los cursos del jugador con inscripción APPROVED, incluyendo horarios y venue."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener mis clases",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/me/classes?fromDate=2026-03-01&toDate=2026-03-31&attendanceStatus=PRESENT",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "classes"
+              ],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "2026-03-01",
+                  "description": "Fecha inicial YYYY-MM-DD (opcional)"
+                },
+                {
+                  "key": "toDate",
+                  "value": "2026-03-31",
+                  "description": "Fecha final YYYY-MM-DD (opcional)"
+                },
+                {
+                  "key": "attendanceStatus",
+                  "value": "PRESENT",
+                  "description": "PRESENT o ABSENT (opcional)"
+                },
+                {
+                  "key": "courseId",
+                  "value": "",
+                  "description": "ID de curso para filtrar (opcional)",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Lista asistencias del jugador a clases de cursos inscritos con filtros opcionales."
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

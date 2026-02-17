@@ -12,6 +12,8 @@ import { FilesModule } from './files/files.module';
 import { CourtsModule } from './courts/courts.module';
 import { VenuesModule } from './venues/venues.module';
 import { ReservationsModule } from './reservations/reservations.module';
+import { PracticesModule } from './practices/practices.module';
+import { ClassesModule } from './classes/classes.module';
 
 @Module({
   imports: [
@@ -48,6 +50,8 @@ import { ReservationsModule } from './reservations/reservations.module';
     CourtsModule,
     VenuesModule,
     ReservationsModule,
+    PracticesModule,
+    ClassesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

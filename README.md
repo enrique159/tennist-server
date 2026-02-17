@@ -708,6 +708,195 @@ Authorization: Bearer <token>
 
 ---
 
+### 🏃 Prácticas de Jugador (Player Practices)
+
+Permite que un jugador registre sesiones de práctica y consulte su progreso.
+
+#### Crear práctica manual o de clase
+```http
+POST /users/me/practices
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "practiceDate": "2026-02-16",
+  "durationMinutes": 90,
+  "playedFriendlyMatch": true,
+  "practicedServes": true,
+  "venueId": "uuid-opcional",
+  "sourceType": "MANUAL",
+  "notes": "Sesión de control y consistencia"
+}
+```
+
+**Campos clave:**
+- `practiceDate`: Fecha de práctica en formato `YYYY-MM-DD`
+- `durationMinutes`: Tiempo total de práctica en minutos
+- `playedFriendlyMatch`: Indica si jugó partido amistoso
+- `practicedServes`: Indica si practicó saques
+- `venueId` (opcional): Venue donde realizó la práctica
+- `sourceType`: `MANUAL` o `CLASS`
+
+**Para registrar una práctica de clase (`sourceType = CLASS`):**
+- Debe enviar `classAttended: true`
+- Debe enviar `classSessionId`
+- El sistema valida que el jugador tenga asistencia `PRESENT` en esa clase
+
+#### Listar mis prácticas
+```http
+GET /users/me/practices?fromDate=2026-02-01&toDate=2026-02-16&sourceType=MANUAL
+Authorization: Bearer <token>
+```
+
+**Filtros opcionales:**
+- `fromDate` y `toDate` en formato `YYYY-MM-DD`
+- `sourceType` (`MANUAL` o `CLASS`)
+
+#### Ver estadísticas de progreso
+```http
+GET /users/me/practices/stats?fromDate=2026-02-01&toDate=2026-02-16
+Authorization: Bearer <token>
+```
+
+**Incluye:**
+- Total de prácticas y minutos acumulados
+- Promedio de duración por práctica
+- Prácticas con amistosos y con saques
+- Distribución por tipo (`MANUAL`/`CLASS`)
+- Días únicos de práctica, racha actual, racha más larga
+- Porcentaje de consistencia en el rango consultado
+
+---
+
+### 🎓 Cursos y Clases (Coaching Domain)
+
+Permite que usuarios con rol `COACH`, `COURT_OWNER` o `ADMIN` creen cursos y gestionen clases.
+
+#### Crear curso
+```http
+POST /courses
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "Tecnificación de Saque",
+  "description": "Curso grupal para mejorar consistencia y potencia",
+  "groupName": "Grupo Juvenil A",
+  "difficulty": "INTERMEDIATE",
+  "maxCapacity": 12,
+  "startDate": "2026-03-01",
+  "endDate": "2026-05-30",
+  "status": "DRAFT",
+  "venueId": "uuid-opcional",
+  "schedules": [
+    { "dayOfWeek": 2, "startTime": "18:00", "endTime": "19:30" },
+    { "dayOfWeek": 4, "startTime": "18:00", "endTime": "19:30" }
+  ]
+}
+```
+
+#### Buscar cursos
+```http
+GET /courses?search=saque&difficulty=INTERMEDIATE&status=ACTIVE&page=1&limit=10
+Authorization: Bearer <token>
+```
+
+#### Cambiar estado del curso
+```http
+PATCH /courses/:courseId/status
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "ACTIVE"
+}
+```
+
+#### Solicitar inscripción a un curso (jugador)
+```http
+POST /courses/:courseId/enrollments/request
+Authorization: Bearer <token>
+```
+
+#### Agregar jugador directamente (dueño del curso)
+```http
+POST /courses/:courseId/enrollments/add-user
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "userId": "uuid-del-jugador",
+  "reviewNotes": "Invitado por rendimiento en evaluación"
+}
+```
+
+#### Aprobar/rechazar solicitud de inscripción
+```http
+PATCH /courses/:courseId/enrollments/:enrollmentId/review
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "APPROVED",
+  "reviewNotes": "Cupo confirmado"
+}
+```
+
+#### Listar inscripciones de un curso
+```http
+GET /courses/:courseId/enrollments?status=PENDING
+Authorization: Bearer <token>
+```
+
+#### Registrar clase dictada con asistencia y notas
+```http
+POST /courses/:courseId/classes
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "date": "2026-03-10",
+  "startTime": "18:00",
+  "endTime": "19:30",
+  "generalNotes": "Sesión enfocada en segundo saque",
+  "attendance": [
+    {
+      "userId": "uuid-jugador",
+      "status": "PRESENT",
+      "playerNotes": "Mejoró la altura del lanzamiento"
+    }
+  ]
+}
+```
+
+**Regla de inicio de clases:** solo se permite registrar clases cuando el curso está en `ACTIVE` y, si tiene `startDate`, esa fecha ya pasó o es hoy.
+
+#### Listar clases de un curso
+```http
+GET /courses/:courseId/classes
+Authorization: Bearer <token>
+```
+
+#### Ver mis cursos (jugador)
+```http
+GET /users/me/courses
+Authorization: Bearer <token>
+```
+
+Retorna cursos donde el usuario tiene inscripción `APPROVED`.
+
+#### Ver mis clases (jugador)
+```http
+GET /users/me/classes?fromDate=2026-03-01&toDate=2026-03-31&attendanceStatus=PRESENT
+Authorization: Bearer <token>
+```
+
+Filtros opcionales: `fromDate`, `toDate`, `courseId`, `attendanceStatus`.
+
+**Integración automática con prácticas:** al registrar una clase, cada alumno con asistencia `PRESENT` genera automáticamente una práctica de tipo `CLASS` (sin duplicados por sesión).
+
+---
+
 ## 🏗️ Arquitectura del Proyecto
 
 ### Estructura de Directorios
@@ -732,6 +921,11 @@ src/
 │   ├── dto/
 │   ├── reservations.service.ts
 │   └── reservations.controller.ts
+├── classes/            # Módulo de cursos y clases
+│   ├── entities/      # Course, Enrollment, Session, Attendance
+│   ├── dto/
+│   ├── classes.service.ts
+│   └── classes.controller.ts
 ├── shared/             # Recursos compartidos
 │   ├── guards/        # Guards globales
 │   ├── decorators/    # Decoradores personalizados
@@ -745,9 +939,9 @@ src/
 1. **User Domain**: Usuarios, roles, autenticación
 2. **Infrastructure Domain**: Venues, canchas, horarios, disponibilidad, precios
 3. **Reservation Domain**: Reservas de canchas, cancelaciones
-4. **Sports Domain**: Partidos, estadísticas, prácticas (futuro)
+4. **Sports Domain**: Partidos, estadísticas y prácticas
 5. **Social Domain**: Amigos, invitaciones, posts (futuro)
-6. **Coaching Domain**: Coaches, clases, cursos (futuro)
+6. **Coaching Domain**: Coaches, cursos, clases, inscripciones y asistencia
 
 ### Sistema de Roles
 
